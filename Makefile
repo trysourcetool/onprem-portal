@@ -5,3 +5,9 @@ create-migrate:
 PHONY: migrate
 migrate:
 	./devtools/cmd/db/main migrate
+
+PHONY: lint
+lint:
+	@echo "Running linters on codebase..."
+	@gofumpt -l -w . && \
+		golangci-lint run --print-issued-lines --fix --go=1.23
