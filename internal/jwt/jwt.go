@@ -2,7 +2,7 @@ package jwt
 
 import (
 	"errors"
-	"fmt"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 
@@ -10,25 +10,7 @@ import (
 	"github.com/trysourcetool/onprem-portal/internal/errdefs"
 )
 
-// JWTClaims is a generic constraint for all JWT claims types.
-type JWTClaims interface {
-	jwt.Claims
-	*UserMagicLinkRegistrationClaims
-}
-
-// NewClaims creates a new instance of the claims type.
-func NewClaims[T JWTClaims]() T {
-	var zero T
-	switch any(zero).(type) {
-	case *UserMagicLinkRegistrationClaims:
-		return any(&UserMagicLinkRegistrationClaims{}).(T)
-	default:
-		return zero
-	}
-}
-
-// SignToken is a generic function to sign JWT tokens.
-func SignToken[T JWTClaims](claims T) (string, error) {
+func signToken(claims jwt.Claims) (string, error) {
 	tok := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	token, err := tok.SignedString([]byte(config.Config.Jwt.Key))
@@ -39,21 +21,28 @@ func SignToken[T JWTClaims](claims T) (string, error) {
 	return token, nil
 }
 
-// ParseToken is a generic function to parse JWT tokens.
-func ParseToken[T JWTClaims](token string) (T, error) {
+func SignMagicLinkRegistrationToken(email string) (string, error) {
+	return signToken(MagicLinkRegistrationClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			Issuer:    issuer,
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)),
+			Subject:   email,
+		},
+	})
+}
+
+func ParseMagicLinkRegistrationClaims(token string) (*MagicLinkRegistrationClaims, error) {
 	if token == "" {
-		var zero T
-		return zero, errdefs.ErrInternal(errors.New("failed to get token"))
+		return nil, errdefs.ErrInternal(errors.New("failed to get token"))
 	}
 
-	result := NewClaims[T]()
-	_, err := jwt.ParseWithClaims(token, result, func(token *jwt.Token) (any, error) {
+	claims := &MagicLinkRegistrationClaims{}
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (any, error) {
 		return []byte(config.Config.Jwt.Key), nil
 	})
 	if err != nil {
-		var zero T
-		return zero, errdefs.ErrInternal(fmt.Errorf("failed to parse token: %s", err))
+		return nil, errdefs.ErrInternal(err)
 	}
 
-	return result, nil
+	return claims, nil
 }
