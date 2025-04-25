@@ -26,8 +26,13 @@ type config struct {
 		Host     string `env:"POSTGRES_HOST"`
 		Port     string `env:"POSTGRES_PORT"`
 	}
-	Resend struct {
-		APIKey string `env:"RESEND_API_KEY"`
+	SMTP struct {
+		Host      string `env:"SMTP_HOST"`
+		Port      string `env:"SMTP_PORT"`
+		Username  string `env:"SMTP_USERNAME"`
+		Password  string `env:"SMTP_PASSWORD"`
+		FromEmail string `env:"SMTP_FROM_EMAIL"`
+		UseTLS    bool   `env:"SMTP_USE_TLS"`
 	}
 }
 
