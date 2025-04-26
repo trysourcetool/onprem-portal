@@ -17,6 +17,7 @@ import (
 	"github.com/trysourcetool/onprem-portal/internal/config"
 	"github.com/trysourcetool/onprem-portal/internal/logger"
 	"github.com/trysourcetool/onprem-portal/internal/postgres"
+	"github.com/trysourcetool/onprem-portal/internal/server"
 )
 
 func init() {
@@ -34,7 +35,6 @@ func main() {
 	}
 
 	db := postgres.New(pqClient)
-	_ = db
 
 	// if config.Config.Env == config.EnvLocal {
 	// 	if err := internal.LoadFixtures(ctx, db); err != nil {
@@ -49,8 +49,8 @@ func main() {
 	}
 
 	handler := chi.NewRouter()
-	// s := server.New(db, pubsub, wsManager, permission.NewChecker(db), upgrader)
-	// s.Install(handler)
+	s := server.New(db)
+	s.Install(handler)
 
 	srv := &http.Server{
 		ReadHeaderTimeout: 10 * time.Second,
