@@ -69,6 +69,13 @@ func (s *Server) installRESTHandlers(router *chi.Mux) {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`{"status": "ok"}`))
 		})
+
+		r.Route("/v1", func(r chi.Router) {
+			r.Route("/auth", func(r chi.Router) {
+				r.Post("/refreshToken", s.errorHandler(s.handleRefreshToken))
+				r.Post("/logout", s.errorHandler(s.handleLogout))
+			})
+		})
 	})
 }
 
@@ -143,4 +150,9 @@ func (s *Server) renderJSON(w http.ResponseWriter, status int, v any) error {
 	}
 
 	return nil
+}
+
+type statusResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }

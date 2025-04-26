@@ -2,6 +2,7 @@ package jwt
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -19,6 +20,33 @@ func signToken(claims jwt.Claims) (string, error) {
 	}
 
 	return token, nil
+}
+
+func SignAuthToken(userID, xsrfToken string, expiresAt time.Time) (string, error) {
+	return signToken(&AuthClaims{
+		XSRFToken: xsrfToken,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expiresAt),
+			Issuer:    issuer,
+			Subject:   userID,
+		},
+	})
+}
+
+func ParseAuthClaims(token string) (*AuthClaims, error) {
+	if token == "" {
+		return nil, errdefs.ErrInternal(errors.New("failed to get token"))
+	}
+
+	claims := &AuthClaims{}
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (any, error) {
+		return []byte(config.Config.Jwt.Key), nil
+	})
+	if err != nil {
+		return nil, errdefs.ErrInternal(fmt.Errorf("failed to parse token: %s", err))
+	}
+
+	return claims, nil
 }
 
 func SignMagicLinkRegistrationToken(email string) (string, error) {

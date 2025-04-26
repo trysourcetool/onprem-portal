@@ -7,6 +7,7 @@ import (
 )
 
 type UserStore interface {
+	GetByRefreshTokenHash(ctx context.Context, refreshTokenHash string) (*core.User, error)
 	GetByEmail(ctx context.Context, email string) (*core.User, error)
 	GetByGoogleID(ctx context.Context, googleID string) (*core.User, error)
 	Create(ctx context.Context, user *core.User) error
