@@ -6,15 +6,26 @@ import (
 	"github.com/trysourcetool/onprem-portal/internal/config"
 )
 
-const domain = "portal.trysourcetool.com"
-
 type cookieConfig struct {
 	isLocalEnv bool
+	domain     string
 }
 
 func newCookieConfig() *cookieConfig {
+	var domain string
+	switch config.Config.Env {
+	case config.EnvLocal:
+		domain = ""
+	case config.EnvStaging:
+		domain = "staging.portal.trysourcetool.com"
+	case config.EnvProd:
+		domain = "portal.trysourcetool.com"
+	default:
+		domain = "portal.trysourcetool.com"
+	}
 	return &cookieConfig{
 		isLocalEnv: config.Config.Env == config.EnvLocal,
+		domain:     domain,
 	}
 }
 
@@ -35,7 +46,7 @@ func (c *cookieConfig) setCookie(w http.ResponseWriter, name, value string, maxA
 		Value:    value,
 		MaxAge:   maxAge,
 		Path:     "/",
-		Domain:   domain,
+		Domain:   c.domain,
 		HttpOnly: httpOnly,
 		Secure:   c.isSecure(),
 		SameSite: sameSite,
@@ -45,7 +56,7 @@ func (c *cookieConfig) setCookie(w http.ResponseWriter, name, value string, maxA
 func (c *cookieConfig) deleteCookie(w http.ResponseWriter, r *http.Request, name string, httpOnly bool, sameSite http.SameSite) {
 	if cookie, _ := r.Cookie(name); cookie != nil {
 		cookie.MaxAge = -1
-		cookie.Domain = domain
+		cookie.Domain = c.domain
 		cookie.Path = "/"
 		cookie.HttpOnly = httpOnly
 		cookie.Secure = c.isSecure()
