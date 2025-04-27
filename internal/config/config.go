@@ -27,6 +27,12 @@ type config struct {
 		Host     string `env:"POSTGRES_HOST"`
 		Port     string `env:"POSTGRES_PORT"`
 	}
+	Google struct {
+		OAuth struct {
+			ClientID     string `env:"GOOGLE_OAUTH_CLIENT_ID"`
+			ClientSecret string `env:"GOOGLE_OAUTH_CLIENT_SECRET"`
+		}
+	}
 	SMTP struct {
 		Host      string `env:"SMTP_HOST"`
 		Port      string `env:"SMTP_PORT"`

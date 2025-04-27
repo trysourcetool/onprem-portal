@@ -16,3 +16,14 @@ type MagicLinkClaims struct {
 type MagicLinkRegistrationClaims struct {
 	jwt.RegisteredClaims
 }
+
+type GoogleAuthLinkClaims struct {
+	jwt.RegisteredClaims
+}
+
+type GoogleRegistrationClaims struct {
+	GoogleID  string
+	FirstName string
+	LastName  string
+	jwt.RegisteredClaims
+}

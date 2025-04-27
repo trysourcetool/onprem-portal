@@ -100,3 +100,57 @@ func ParseMagicLinkRegistrationClaims(token string) (*MagicLinkRegistrationClaim
 
 	return claims, nil
 }
+
+func SignGoogleAuthLinkToken() (string, error) {
+	return signToken(&GoogleAuthLinkClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(5 * time.Minute)),
+			Issuer:    issuer,
+		},
+	})
+}
+
+func ParseGoogleAuthLinkClaims(token string) (*GoogleAuthLinkClaims, error) {
+	if token == "" {
+		return nil, errdefs.ErrInternal(errors.New("failed to get token"))
+	}
+
+	claims := &GoogleAuthLinkClaims{}
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (any, error) {
+		return []byte(config.Config.Jwt.Key), nil
+	})
+	if err != nil {
+		return nil, errdefs.ErrInternal(fmt.Errorf("failed to parse token: %s", err))
+	}
+
+	return claims, nil
+}
+
+func SignGoogleRegistrationToken(googleID, email, firstName, lastName string) (string, error) {
+	return signToken(&GoogleRegistrationClaims{
+		GoogleID:  googleID,
+		FirstName: firstName,
+		LastName:  lastName,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(5 * time.Minute)),
+			Issuer:    issuer,
+			Subject:   email,
+		},
+	})
+}
+
+func ParseGoogleRegistrationClaims(token string) (*GoogleRegistrationClaims, error) {
+	if token == "" {
+		return nil, errdefs.ErrInternal(errors.New("failed to get token"))
+	}
+
+	claims := &GoogleRegistrationClaims{}
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (any, error) {
+		return []byte(config.Config.Jwt.Key), nil
+	})
+	if err != nil {
+		return nil, errdefs.ErrInternal(fmt.Errorf("failed to parse token: %s", err))
+	}
+
+	return claims, nil
+}

@@ -10,14 +10,15 @@ import (
 )
 
 var (
-	ErrInternal         = Status("internal_server_error", 500)
-	ErrDatabase         = Status("database_error", 500)
-	ErrPermissionDenied = Status("permission_denied", 403)
-	ErrInvalidArgument  = Status("invalid_argument", 400)
-	ErrAlreadyExists    = Status("already_exists", 409)
-	ErrUnauthenticated  = Status("unauthenticated", 401)
-	ErrResend           = Status("resend_error", 500)
-	ErrUserNotFound     = Status("user_not_found", 404)
+	ErrInternal               = Status("internal_server_error", 500)
+	ErrDatabase               = Status("database_error", 500)
+	ErrPermissionDenied       = Status("permission_denied", 403)
+	ErrInvalidArgument        = Status("invalid_argument", 400)
+	ErrAlreadyExists          = Status("already_exists", 409)
+	ErrUnauthenticated        = Status("unauthenticated", 401)
+	ErrResend                 = Status("resend_error", 500)
+	ErrUserNotFound           = Status("user_not_found", 404)
+	ErrUserEmailAlreadyExists = Status("user_email_already_exists", 409)
 )
 
 type Meta []any
