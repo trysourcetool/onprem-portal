@@ -72,6 +72,10 @@ func (s *Server) installRESTHandlers(router *chi.Mux) {
 
 		r.Route("/v1", func(r chi.Router) {
 			r.Route("/auth", func(r chi.Router) {
+				r.Post("/magic/request", s.errorHandler(s.handleRequestMagicLink))
+				r.Post("/magic/authenticate", s.errorHandler(s.handleAuthenticateWithMagicLink))
+				r.Post("/magic/register", s.errorHandler(s.handleRegisterWithMagicLink))
+
 				r.Post("/refreshToken", s.errorHandler(s.handleRefreshToken))
 				r.Post("/logout", s.errorHandler(s.handleLogout))
 			})

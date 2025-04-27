@@ -9,6 +9,10 @@ type AuthClaims struct {
 	jwt.RegisteredClaims
 }
 
+type MagicLinkClaims struct {
+	jwt.RegisteredClaims
+}
+
 type MagicLinkRegistrationClaims struct {
 	jwt.RegisteredClaims
 }

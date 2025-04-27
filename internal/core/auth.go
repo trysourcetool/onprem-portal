@@ -34,8 +34,7 @@ func GenerateRefreshToken() (plainRefreshToken, hashedRefreshToken string, err e
 
 	plainRefreshToken = base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(randomBytes)
 
-	hash := sha256.Sum256([]byte(plainRefreshToken))
-	hashedRefreshToken = hex.EncodeToString(hash[:])
+	hashedRefreshToken = HashRefreshToken(plainRefreshToken)
 
 	return plainRefreshToken, hashedRefreshToken, nil
 }

@@ -143,3 +143,11 @@ func errID() string {
 
 	return base64.StdEncoding.EncodeToString(b)
 }
+
+func IsUserNotFound(err error) bool {
+	val, ok := err.(*Error)
+	if !ok {
+		return false
+	}
+	return val.Title == "user_not_found"
+}

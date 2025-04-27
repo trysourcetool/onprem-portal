@@ -12,4 +12,5 @@ type UserStore interface {
 	GetByGoogleID(ctx context.Context, googleID string) (*core.User, error)
 	Create(ctx context.Context, user *core.User) error
 	Update(ctx context.Context, user *core.User) error
+	IsEmailExists(ctx context.Context, email string) (bool, error)
 }

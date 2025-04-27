@@ -8,13 +8,14 @@ import (
 )
 
 type User struct {
-	ID        uuid.UUID `json:"id"`
-	Email     string    `json:"email"`
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
-	GoogleID  string    `json:"google_id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID               uuid.UUID `json:"id"`
+	Email            string    `json:"email"`
+	FirstName        string    `json:"first_name"`
+	LastName         string    `json:"last_name"`
+	RefreshTokenHash string    `json:"refresh_token_hash"`
+	GoogleID         string    `json:"google_id"`
+	CreatedAt        time.Time `json:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at"`
 }
 
 func (u *User) FullName() string {

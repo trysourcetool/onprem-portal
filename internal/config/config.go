@@ -15,8 +15,9 @@ const (
 )
 
 type config struct {
-	Env string `env:"ENV"`
-	Jwt struct {
+	BaseURL string `env:"BASE_URL"`
+	Env     string `env:"ENV"`
+	Jwt     struct {
 		Key string `env:"JWT_KEY"`
 	}
 	Postgres struct {

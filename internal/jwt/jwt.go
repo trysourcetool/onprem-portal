@@ -49,6 +49,32 @@ func ParseAuthClaims(token string) (*AuthClaims, error) {
 	return claims, nil
 }
 
+func SignMagicLinkToken(email string) (string, error) {
+	return signToken(&MagicLinkClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)),
+			Issuer:    issuer,
+			Subject:   email,
+		},
+	})
+}
+
+func ParseMagicLinkClaims(token string) (*MagicLinkClaims, error) {
+	if token == "" {
+		return nil, errdefs.ErrInternal(errors.New("failed to get token"))
+	}
+
+	claims := &MagicLinkClaims{}
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (any, error) {
+		return []byte(config.Config.Jwt.Key), nil
+	})
+	if err != nil {
+		return nil, errdefs.ErrInternal(fmt.Errorf("failed to parse token: %s", err))
+	}
+
+	return claims, nil
+}
+
 func SignMagicLinkRegistrationToken(email string) (string, error) {
 	return signToken(MagicLinkRegistrationClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
