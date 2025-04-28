@@ -4,6 +4,7 @@ import (
 	"context"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/gofrs/uuid/v5"
 	"github.com/lib/pq"
 
 	"github.com/trysourcetool/onprem-portal/internal"
@@ -24,6 +25,24 @@ func newUserStore(db internal.DB) *userStore {
 		db:      db,
 		builder: sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 	}
+}
+
+func (s *userStore) GetByID(ctx context.Context, id uuid.UUID) (*core.User, error) {
+	query, args, err := s.builder.
+		Select(s.columns()...).
+		From("user").
+		Where(sq.Eq{"id": id}).
+		ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	var u core.User
+	if err := s.db.GetContext(ctx, &u, query, args...); err != nil {
+		return nil, err
+	}
+
+	return &u, nil
 }
 
 func (s *userStore) GetByRefreshTokenHash(ctx context.Context, refreshTokenHash string) (*core.User, error) {

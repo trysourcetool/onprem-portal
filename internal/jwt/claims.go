@@ -27,3 +27,8 @@ type GoogleRegistrationClaims struct {
 	LastName  string
 	jwt.RegisteredClaims
 }
+
+type UpdateUserEmailClaims struct {
+	Email string
+	jwt.RegisteredClaims
+}

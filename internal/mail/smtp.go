@@ -152,3 +152,29 @@ The Sourcetool Team`, firstName, url)
 
 	return nil
 }
+
+func SendUpdateEmailInstructions(ctx context.Context, to, firstName, url string) error {
+	subject := "[Sourcetool] Confirm your new email address"
+	content := fmt.Sprintf(`Hi %s,
+
+We received a request to change the email address associated with your Sourcetool account. To ensure the security of your account, we need you to verify your new email address.
+
+Please click the following link within the next 24 hours to confirm your email change:
+%s
+
+Thank you for being a part of the Sourcetool community!
+Regards,
+
+The Sourcetool Team`,
+		firstName,
+		url,
+	)
+
+	return send(ctx, input{
+		From:     config.Config.SMTP.FromEmail,
+		FromName: fromName,
+		To:       []string{to},
+		Subject:  subject,
+		Body:     content,
+	})
+}

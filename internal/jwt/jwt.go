@@ -154,3 +154,30 @@ func ParseGoogleRegistrationClaims(token string) (*GoogleRegistrationClaims, err
 
 	return claims, nil
 }
+
+func SignUpdateUserEmailToken(userID, email string) (string, error) {
+	return signToken(&UpdateUserEmailClaims{
+		Email: email,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			Issuer:    issuer,
+			Subject:   userID,
+		},
+	})
+}
+
+func ParseUpdateUserEmailClaims(token string) (*UpdateUserEmailClaims, error) {
+	if token == "" {
+		return nil, errdefs.ErrInternal(errors.New("failed to get token"))
+	}
+
+	claims := &UpdateUserEmailClaims{}
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (any, error) {
+		return []byte(config.Config.Jwt.Key), nil
+	})
+	if err != nil {
+		return nil, errdefs.ErrInternal(fmt.Errorf("failed to parse token: %s", err))
+	}
+
+	return claims, nil
+}

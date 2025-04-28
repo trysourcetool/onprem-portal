@@ -83,6 +83,17 @@ func (s *Server) installRESTHandlers(router *chi.Mux) {
 				r.Post("/refreshToken", s.errorHandler(s.handleRefreshToken))
 				r.Post("/logout", s.errorHandler(s.handleLogout))
 			})
+
+			r.Route("/users", func(r chi.Router) {
+				r.Use(s.authUser)
+
+				r.Route("/me", func(r chi.Router) {
+					r.Get("/", s.errorHandler(s.handleGetMe))
+					r.Put("/", s.errorHandler(s.handleUpdateMe))
+					r.Post("/email/instructions", s.errorHandler(s.handleSendUpdateMeEmailInstructions))
+					r.Put("/email", s.errorHandler(s.handleUpdateMeEmail))
+				})
+			})
 		})
 	})
 }
