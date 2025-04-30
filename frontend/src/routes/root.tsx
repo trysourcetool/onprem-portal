@@ -1,0 +1,54 @@
+import {
+  Link,
+  Outlet,
+  createRootRoute,
+  useNavigate,
+} from '@tanstack/react-router';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import type { ErrorComponentProps } from '@tanstack/react-router';
+import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+
+function Fallback(props: ErrorComponentProps) {
+  const navigate = useNavigate();
+  return (
+    <div className="m-auto flex items-center justify-center">
+      <div className="flex max-w-[374px] flex-col gap-6 p-6">
+        <CardHeader className="p-0">
+          <CardTitle>Error: {props.error.name}</CardTitle>
+          <CardDescription>{props.error.message}</CardDescription>
+        </CardHeader>
+        <Button
+          onClick={() => {
+            props.reset();
+            navigate({ to: '/' });
+          }}
+        >
+          Back to home
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <>
+      <Outlet />
+      <TanStackRouterDevtools position="bottom-right" />
+    </>
+  );
+}
+
+export const Route = createRootRoute({
+  component: App,
+  errorComponent: Fallback,
+  notFoundComponent: () => {
+    return (
+      <div>
+        <p>This is the notFoundComponent configured on root route</p>
+        <Link to="/">Start Over</Link>
+      </div>
+    );
+  },
+});
