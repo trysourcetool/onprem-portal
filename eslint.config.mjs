@@ -33,6 +33,7 @@ export default tseslint.config(
       'unused-imports': pluginUnusedImports,
     },
     rules: {
+      '@typescript-eslint/no-unnecessary-condition': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/naming-convention': [
         'error',

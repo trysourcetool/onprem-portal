@@ -4,6 +4,6 @@ export default function Index() {
   return <div>Index</div>
 }
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute('/_default/')({
   component: Index,
 })

@@ -4,10 +4,12 @@ import {
   createRootRoute,
   useNavigate,
 } from '@tanstack/react-router';
+import { ThemeProvider } from 'next-themes';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import type { ErrorComponentProps } from '@tanstack/react-router';
 import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { AuthProvider } from '@/components/provider/auth-provider';
 
 function Fallback(props: ErrorComponentProps) {
   const navigate = useNavigate();
@@ -34,8 +36,12 @@ function Fallback(props: ErrorComponentProps) {
 export default function App() {
   return (
     <>
-      <Outlet />
-      <TanStackRouterDevtools position="bottom-right" />
+      <ThemeProvider enableSystem={false} attribute="class">
+        <AuthProvider>
+          <Outlet />
+          <TanStackRouterDevtools position="bottom-right" />
+        </AuthProvider>
+      </ThemeProvider>
     </>
   );
 }

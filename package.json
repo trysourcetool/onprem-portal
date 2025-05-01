@@ -6,6 +6,7 @@
   "scripts": {
     "lint:frontend": "eslint ./frontend",
     "dev:frontend": "pnpm --filter onprem-portal-frontend dev",
+    "dev:frontend:tsr": "pnpm --filter onprem-portal-frontend dev:tsr",
     "build:frontend": "pnpm --filter onprem-portal-frontend build",
     "serve:frontend": "pnpm --filter onprem-portal-frontend serve",
     "test:frontend": "pnpm --filter onprem-portal-frontend test"

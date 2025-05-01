@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { routeTree } from './routeTree.gen';
 
-import * as TanstackQuery from './integrations/tanstack-query/root-provider';
+import * as TanstackQuery from './components/provider/tanstack-query-provider';
 
 import './styles.css';
 import reportWebVitals from './reportWebVitals.ts';

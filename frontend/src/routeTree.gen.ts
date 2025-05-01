@@ -11,60 +11,106 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/root'
+import { Route as layoutDefaultImport } from './routes/layout-default'
+import { Route as loginIndexImport } from './routes/login/index'
 import { Route as indexImport } from './routes/index'
 
 // Create/Update Routes
 
+const layoutDefaultRoute = layoutDefaultImport.update({
+  id: '/_default',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const loginIndexRoute = loginIndexImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => layoutDefaultRoute,
+} as any)
+
 const indexRoute = indexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => layoutDefaultRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_default': {
+      id: '/_default'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof layoutDefaultImport
+      parentRoute: typeof rootRoute
+    }
+    '/_default/': {
+      id: '/_default/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof indexImport
-      parentRoute: typeof rootRoute
+      parentRoute: typeof layoutDefaultImport
+    }
+    '/_default/login': {
+      id: '/_default/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof loginIndexImport
+      parentRoute: typeof layoutDefaultImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface layoutDefaultRouteChildren {
+  indexRoute: typeof indexRoute
+  loginIndexRoute: typeof loginIndexRoute
+}
+
+const layoutDefaultRouteChildren: layoutDefaultRouteChildren = {
+  indexRoute: indexRoute,
+  loginIndexRoute: loginIndexRoute,
+}
+
+const layoutDefaultRouteWithChildren = layoutDefaultRoute._addFileChildren(
+  layoutDefaultRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
+  '': typeof layoutDefaultRouteWithChildren
   '/': typeof indexRoute
+  '/login': typeof loginIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof indexRoute
+  '/login': typeof loginIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof indexRoute
+  '/_default': typeof layoutDefaultRouteWithChildren
+  '/_default/': typeof indexRoute
+  '/_default/login': typeof loginIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '' | '/' | '/login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/login'
+  id: '__root__' | '/_default' | '/_default/' | '/_default/login'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  indexRoute: typeof indexRoute
+  layoutDefaultRoute: typeof layoutDefaultRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  indexRoute: indexRoute,
+  layoutDefaultRoute: layoutDefaultRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -77,11 +123,23 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "root.tsx",
       "children": [
-        "/"
+        "/_default"
       ]
     },
-    "/": {
-      "filePath": "index.tsx"
+    "/_default": {
+      "filePath": "layout-default.tsx",
+      "children": [
+        "/_default/",
+        "/_default/login"
+      ]
+    },
+    "/_default/": {
+      "filePath": "index.tsx",
+      "parent": "/_default"
+    },
+    "/_default/login": {
+      "filePath": "login/index.tsx",
+      "parent": "/_default"
     }
   }
 }
