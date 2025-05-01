@@ -30,4 +30,22 @@ CREATE TRIGGER update_user_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
+-- license table
+CREATE TABLE "license" (
+  "id"         UUID         NOT NULL,
+  "user_id"    UUID         NOT NULL,
+  "key"        VARCHAR(255) NOT NULL UNIQUE,
+  "created_at" TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY ("user_id") REFERENCES "user" ("id") ON DELETE CASCADE,
+  PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX idx_license_key ON "license" ("key");
+
+CREATE TRIGGER update_license_updated_at
+    BEFORE UPDATE ON "license"
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
 END;

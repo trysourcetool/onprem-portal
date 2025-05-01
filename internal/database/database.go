@@ -5,6 +5,7 @@ import (
 )
 
 type Stores interface {
+	License() LicenseStore
 	User() UserStore
 }
 

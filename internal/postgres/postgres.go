@@ -39,6 +39,10 @@ func (db *db) WithTx(ctx context.Context, fn func(tx database.Tx) error) error {
 	return sqlxTx.Commit()
 }
 
+func (db *db) License() database.LicenseStore {
+	return newLicenseStore(internal.NewQueryLogger(db.db))
+}
+
 func (db *db) User() database.UserStore {
 	return newUserStore(internal.NewQueryLogger(db.db))
 }
@@ -47,6 +51,10 @@ var _ database.Tx = (*tx)(nil)
 
 type tx struct {
 	db *sqlx.Tx
+}
+
+func (t *tx) License() database.LicenseStore {
+	return newLicenseStore(internal.NewQueryLogger(t.db))
 }
 
 func (t *tx) User() database.UserStore {
