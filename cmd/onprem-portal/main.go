@@ -15,6 +15,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/trysourcetool/onprem-portal/internal/config"
+	"github.com/trysourcetool/onprem-portal/internal/encrypt"
 	"github.com/trysourcetool/onprem-portal/internal/logger"
 	"github.com/trysourcetool/onprem-portal/internal/postgres"
 	"github.com/trysourcetool/onprem-portal/internal/server"
@@ -35,6 +36,10 @@ func main() {
 	}
 
 	db := postgres.New(pqClient)
+	encryptor, err := encrypt.NewEncryptor()
+	if err != nil {
+		logger.Logger.Fatal("failed to create encryptor", zap.Error(err))
+	}
 
 	// if config.Config.Env == config.EnvLocal {
 	// 	if err := internal.LoadFixtures(ctx, db); err != nil {
@@ -49,7 +54,7 @@ func main() {
 	}
 
 	handler := chi.NewRouter()
-	s := server.New(db)
+	s := server.New(db, encryptor)
 	s.Install(handler)
 
 	srv := &http.Server{

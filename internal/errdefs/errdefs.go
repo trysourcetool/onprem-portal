@@ -19,6 +19,7 @@ var (
 	ErrResend                 = Status("resend_error", 500)
 	ErrUserNotFound           = Status("user_not_found", 404)
 	ErrUserEmailAlreadyExists = Status("user_email_already_exists", 409)
+	ErrLicenseNotFound        = Status("license_not_found", 404)
 )
 
 type Meta []any

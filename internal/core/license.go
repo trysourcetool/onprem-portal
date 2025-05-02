@@ -12,11 +12,13 @@ import (
 )
 
 type License struct {
-	ID        uuid.UUID `db:"id"`
-	UserID    uuid.UUID `db:"user_id"`
-	Key       string    `db:"key"`
-	CreatedAt time.Time `db:"created_at"`
-	UpdatedAt time.Time `db:"updated_at"`
+	ID            uuid.UUID `db:"id"`
+	UserID        uuid.UUID `db:"user_id"`
+	KeyHash       string    `db:"key_hash"`
+	KeyCiphertext []byte    `db:"key_ciphertext"`
+	KeyNonce      []byte    `db:"key_nonce"`
+	CreatedAt     time.Time `db:"created_at"`
+	UpdatedAt     time.Time `db:"updated_at"`
 }
 
 func GenerateLicenseKey() (plainKey, hashedKey string, err error) {

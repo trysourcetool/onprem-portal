@@ -19,15 +19,16 @@ import (
 )
 
 type userResponse struct {
-	ID        string `json:"id"`
-	Email     string `json:"email"`
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
-	CreatedAt string `json:"createdAt"`
-	UpdatedAt string `json:"updatedAt"`
+	ID        string           `json:"id"`
+	Email     string           `json:"email"`
+	FirstName string           `json:"firstName"`
+	LastName  string           `json:"lastName"`
+	CreatedAt string           `json:"createdAt"`
+	UpdatedAt string           `json:"updatedAt"`
+	License   *licenseResponse `json:"license,omitempty"`
 }
 
-func userFromModel(user *core.User) *userResponse {
+func (s *Server) userFromModel(user *core.User, l *core.License) *userResponse {
 	if user == nil {
 		return nil
 	}
@@ -39,6 +40,7 @@ func userFromModel(user *core.User) *userResponse {
 		LastName:  user.LastName,
 		CreatedAt: strconv.FormatInt(user.CreatedAt.Unix(), 10),
 		UpdatedAt: strconv.FormatInt(user.UpdatedAt.Unix(), 10),
+		License:   s.licenseFromModel(l),
 	}
 }
 
@@ -50,9 +52,13 @@ func (s *Server) handleGetMe(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 
 	ctxUser := internal.ContextUser(ctx)
+	l, err := s.db.License().GetByUserID(ctx, ctxUser.ID)
+	if err != nil {
+		return err
+	}
 
 	return s.renderJSON(w, http.StatusOK, getMeResponse{
-		User: userFromModel(ctxUser),
+		User: s.userFromModel(ctxUser, l),
 	})
 }
 
@@ -97,7 +103,7 @@ func (s *Server) handleUpdateMe(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return s.renderJSON(w, http.StatusOK, updateMeResponse{
-		User: userFromModel(ctxUser),
+		User: s.userFromModel(ctxUser, nil),
 	})
 }
 
@@ -219,6 +225,6 @@ func (s *Server) handleUpdateMeEmail(w http.ResponseWriter, r *http.Request) err
 	}
 
 	return s.renderJSON(w, http.StatusOK, updateMeEmailResponse{
-		User: userFromModel(ctxUser),
+		User: s.userFromModel(ctxUser, nil),
 	})
 }

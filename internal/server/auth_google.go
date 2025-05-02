@@ -203,18 +203,40 @@ func (s *Server) handleRegisterWithGoogle(w http.ResponseWriter, r *http.Request
 		GoogleID:         claims.GoogleID,
 	}
 
+	plainLicenseKey, hashedLicenseKey, err := core.GenerateLicenseKey()
+	if err != nil {
+		return errdefs.ErrInternal(fmt.Errorf("failed to generate license key: %w", err))
+	}
+
+	ciphertext, nonce, err := s.encryptor.Encrypt([]byte(plainLicenseKey))
+	if err != nil {
+		return errdefs.ErrInternal(fmt.Errorf("failed to encrypt license key: %w", err))
+	}
+
+	l := &core.License{
+		ID:            uuid.Must(uuid.NewV4()),
+		UserID:        u.ID,
+		KeyHash:       hashedLicenseKey,
+		KeyCiphertext: ciphertext,
+		KeyNonce:      nonce,
+	}
+
 	now := time.Now()
 	expiresAt := now.Add(tokenExpiration)
 	xsrfToken := uuid.Must(uuid.NewV4()).String()
 	var token string
 	if err := s.db.WithTx(ctx, func(tx database.Tx) error {
 		if err := tx.User().Create(ctx, u); err != nil {
-			return errdefs.ErrInternal(fmt.Errorf("failed to create user: %w", err))
+			return err
+		}
+
+		if err := tx.License().Create(ctx, l); err != nil {
+			return err
 		}
 
 		token, err = jwt.SignAuthToken(u.ID.String(), xsrfToken, expiresAt)
 		if err != nil {
-			return errdefs.ErrInternal(fmt.Errorf("failed to create auth token: %w", err))
+			return err
 		}
 
 		return nil
