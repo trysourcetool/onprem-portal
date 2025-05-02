@@ -32,16 +32,19 @@ CREATE TRIGGER update_user_updated_at
 
 -- license table
 CREATE TABLE "license" (
-  "id"         UUID         NOT NULL,
-  "user_id"    UUID         NOT NULL,
-  "key"        VARCHAR(255) NOT NULL,
-  "created_at" TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  "updated_at" TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "id"             UUID         NOT NULL,
+  "user_id"        UUID         NOT NULL,
+  "key_hash"       VARCHAR(255) NOT NULL,
+  "key_ciphertext" BYTEA NOT NULL,
+  "key_nonce"      BYTEA NOT NULL,
+  "created_at"     TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at"     TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY ("user_id") REFERENCES "user" ("id") ON DELETE CASCADE,
   PRIMARY KEY ("id")
 );
 
-CREATE UNIQUE INDEX idx_license_key ON "license" ("key");
+CREATE UNIQUE INDEX idx_license_key_hash ON "license" ("key_hash");
+CREATE UNIQUE INDEX idx_license_key_ciphertext_nonce ON "license" ("key_ciphertext", "key_nonce");
 
 CREATE TRIGGER update_license_updated_at
     BEFORE UPDATE ON "license"

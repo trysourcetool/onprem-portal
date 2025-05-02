@@ -15,16 +15,18 @@ import (
 	"github.com/trysourcetool/onprem-portal/internal"
 	"github.com/trysourcetool/onprem-portal/internal/config"
 	"github.com/trysourcetool/onprem-portal/internal/database"
+	"github.com/trysourcetool/onprem-portal/internal/encrypt"
 	"github.com/trysourcetool/onprem-portal/internal/errdefs"
 	"github.com/trysourcetool/onprem-portal/internal/logger"
 )
 
 type Server struct {
-	db database.DB
+	db        database.DB
+	encryptor *encrypt.Encryptor
 }
 
-func New(db database.DB) *Server {
-	return &Server{db}
+func New(db database.DB, encryptor *encrypt.Encryptor) *Server {
+	return &Server{db, encryptor}
 }
 
 func (s *Server) installDefaultMiddlewares(router *chi.Mux) {

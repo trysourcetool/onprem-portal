@@ -220,6 +220,24 @@ func (s *Server) handleRegisterWithMagicLink(w http.ResponseWriter, r *http.Requ
 		RefreshTokenHash: hashedRefreshToken,
 	}
 
+	plainLicenseKey, hashedLicenseKey, err := core.GenerateLicenseKey()
+	if err != nil {
+		return err
+	}
+
+	ciphertext, nonce, err := s.encryptor.Encrypt([]byte(plainLicenseKey))
+	if err != nil {
+		return err
+	}
+
+	l := &core.License{
+		ID:            uuid.Must(uuid.NewV4()),
+		UserID:        u.ID,
+		KeyHash:       hashedLicenseKey,
+		KeyCiphertext: ciphertext,
+		KeyNonce:      nonce,
+	}
+
 	xsrfToken := uuid.Must(uuid.NewV4()).String()
 	now := time.Now()
 	expiresAt := now.Add(core.TokenExpiration())
@@ -228,6 +246,10 @@ func (s *Server) handleRegisterWithMagicLink(w http.ResponseWriter, r *http.Requ
 	if err := s.db.WithTx(ctx, func(tx database.Tx) error {
 		// Create the user in a transaction
 		if err := tx.User().Create(ctx, u); err != nil {
+			return err
+		}
+
+		if err := tx.License().Create(ctx, l); err != nil {
 			return err
 		}
 

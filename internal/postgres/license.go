@@ -32,12 +32,16 @@ func (s *licenseStore) Create(ctx context.Context, l *core.License) error {
 		Columns(
 			`"id"`,
 			`"user_id"`,
-			`"key"`,
+			`"key_hash"`,
+			`"key_ciphertext"`,
+			`"key_nonce"`,
 		).
 		Values(
 			l.ID,
 			l.UserID,
-			l.Key,
+			l.KeyHash,
+			l.KeyCiphertext,
+			l.KeyNonce,
 		).
 		RunWith(s.db).
 		ExecContext(ctx); err != nil {
