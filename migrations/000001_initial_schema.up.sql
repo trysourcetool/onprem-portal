@@ -34,7 +34,7 @@ CREATE TRIGGER update_user_updated_at
 CREATE TABLE "license" (
   "id"         UUID         NOT NULL,
   "user_id"    UUID         NOT NULL,
-  "key"        VARCHAR(255) NOT NULL UNIQUE,
+  "key"        VARCHAR(255) NOT NULL,
   "created_at" TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY ("user_id") REFERENCES "user" ("id") ON DELETE CASCADE,
