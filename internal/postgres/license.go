@@ -2,8 +2,10 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/gofrs/uuid/v5"
 	"github.com/lib/pq"
 
 	"github.com/trysourcetool/onprem-portal/internal"
@@ -24,6 +26,27 @@ func newLicenseStore(db internal.DB) *licenseStore {
 		db:      db,
 		builder: sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 	}
+}
+
+func (s *licenseStore) GetByUserID(ctx context.Context, userID uuid.UUID) (*core.License, error) {
+	query, args, err := s.builder.
+		Select(s.columns()...).
+		From(`"license" l`).
+		Where(sq.Eq{`l."user_id"`: userID}).
+		ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	var l core.License
+	if err := s.db.GetContext(ctx, &l, query, args...); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errdefs.ErrLicenseNotFound(err)
+		}
+		return nil, err
+	}
+
+	return &l, nil
 }
 
 func (s *licenseStore) Create(ctx context.Context, l *core.License) error {
@@ -52,4 +75,14 @@ func (s *licenseStore) Create(ctx context.Context, l *core.License) error {
 	}
 
 	return nil
+}
+
+func (s *licenseStore) columns() []string {
+	return []string{
+		`l."id"`,
+		`l."user_id"`,
+		`l."key_hash"`,
+		`l."key_ciphertext"`,
+		`l."key_nonce"`,
+	}
 }
