@@ -9,11 +9,11 @@ import (
 )
 
 type UserStore interface {
-	GetByID(ctx context.Context, id uuid.UUID) (*core.User, error)
-	GetByRefreshTokenHash(ctx context.Context, refreshTokenHash string) (*core.User, error)
-	GetByEmail(ctx context.Context, email string) (*core.User, error)
-	GetByGoogleID(ctx context.Context, googleID string) (*core.User, error)
-	Create(ctx context.Context, user *core.User) error
-	Update(ctx context.Context, user *core.User) error
-	IsEmailExists(ctx context.Context, email string) (bool, error)
+	GetByID(context.Context, uuid.UUID) (*core.User, error)
+	GetByRefreshTokenHash(context.Context, string) (*core.User, error)
+	GetByEmail(context.Context, string) (*core.User, error)
+	GetByGoogleID(context.Context, string) (*core.User, error)
+	Create(context.Context, *core.User) error
+	Update(context.Context, *core.User) error
+	IsEmailExists(context.Context, string) (bool, error)
 }

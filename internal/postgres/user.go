@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid/v5"
@@ -30,8 +31,8 @@ func newUserStore(db internal.DB) *userStore {
 func (s *userStore) GetByID(ctx context.Context, id uuid.UUID) (*core.User, error) {
 	query, args, err := s.builder.
 		Select(s.columns()...).
-		From("user").
-		Where(sq.Eq{"id": id}).
+		From(`"user" u`).
+		Where(sq.Eq{`u."id"`: id}).
 		ToSql()
 	if err != nil {
 		return nil, err
@@ -39,6 +40,9 @@ func (s *userStore) GetByID(ctx context.Context, id uuid.UUID) (*core.User, erro
 
 	var u core.User
 	if err := s.db.GetContext(ctx, &u, query, args...); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errdefs.ErrUserNotFound(err)
+		}
 		return nil, err
 	}
 
@@ -48,8 +52,8 @@ func (s *userStore) GetByID(ctx context.Context, id uuid.UUID) (*core.User, erro
 func (s *userStore) GetByRefreshTokenHash(ctx context.Context, refreshTokenHash string) (*core.User, error) {
 	query, args, err := s.builder.
 		Select(s.columns()...).
-		From("user").
-		Where(sq.Eq{"refresh_token_hash": refreshTokenHash}).
+		From(`"user" u`).
+		Where(sq.Eq{`u."refresh_token_hash"`: refreshTokenHash}).
 		ToSql()
 	if err != nil {
 		return nil, err
@@ -57,6 +61,9 @@ func (s *userStore) GetByRefreshTokenHash(ctx context.Context, refreshTokenHash 
 
 	var u core.User
 	if err := s.db.GetContext(ctx, &u, query, args...); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errdefs.ErrUserNotFound(err)
+		}
 		return nil, err
 	}
 
@@ -66,8 +73,8 @@ func (s *userStore) GetByRefreshTokenHash(ctx context.Context, refreshTokenHash 
 func (s *userStore) GetByEmail(ctx context.Context, email string) (*core.User, error) {
 	query, args, err := s.builder.
 		Select(s.columns()...).
-		From("user").
-		Where(sq.Eq{"email": email}).
+		From(`"user" u`).
+		Where(sq.Eq{`u."email"`: email}).
 		ToSql()
 	if err != nil {
 		return nil, err
@@ -75,6 +82,9 @@ func (s *userStore) GetByEmail(ctx context.Context, email string) (*core.User, e
 
 	var u core.User
 	if err := s.db.GetContext(ctx, &u, query, args...); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errdefs.ErrUserNotFound(err)
+		}
 		return nil, err
 	}
 
@@ -84,8 +94,8 @@ func (s *userStore) GetByEmail(ctx context.Context, email string) (*core.User, e
 func (s *userStore) GetByGoogleID(ctx context.Context, googleID string) (*core.User, error) {
 	query, args, err := s.builder.
 		Select(s.columns()...).
-		From("user").
-		Where(sq.Eq{"google_id": googleID}).
+		From(`"user" u`).
+		Where(sq.Eq{`u."google_id"`: googleID}).
 		ToSql()
 	if err != nil {
 		return nil, err
@@ -93,6 +103,9 @@ func (s *userStore) GetByGoogleID(ctx context.Context, googleID string) (*core.U
 
 	var u core.User
 	if err := s.db.GetContext(ctx, &u, query, args...); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errdefs.ErrUserNotFound(err)
+		}
 		return nil, err
 	}
 
@@ -158,13 +171,13 @@ func (s *userStore) IsEmailExists(ctx context.Context, email string) (bool, erro
 
 func (s *userStore) columns() []string {
 	return []string{
-		"id",
-		"email",
-		"first_name",
-		"last_name",
-		"google_id",
-		"refresh_token_hash",
-		"created_at",
-		"updated_at",
+		`u."id"`,
+		`u."email"`,
+		`u."first_name"`,
+		`u."last_name"`,
+		`u."google_id"`,
+		`u."refresh_token_hash"`,
+		`u."created_at"`,
+		`u."updated_at"`,
 	}
 }
