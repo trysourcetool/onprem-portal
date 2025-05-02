@@ -38,8 +38,6 @@ export const authenticateWithGoogle = async (params: {
   const res = await api.post<{
     authUrl: string;
     token: string;
-    hasOrganization: boolean;
-    hasMultipleOrganizations: boolean;
     isNewUser: boolean;
   }>({
     path: '/auth/google/authenticate',
@@ -57,7 +55,6 @@ export const registerWithGoogle = async (params: {
   const res = await api.post<{
     authUrl: string;
     token: string;
-    hasOrganization: boolean;
   }>({
     path: '/auth/google/register',
     data: params.data,
@@ -90,9 +87,8 @@ export const authenticateWithMagicLink = async (params: {
   };
 }) => {
   const res = await api.post<{
-    authUrl: string;
-    token: string;
-    hasOrganization: boolean;
+    registrationToken: string;
+    expiresAt: string;
     isNewUser: boolean;
   }>({
     path: '/auth/magic/authenticate',

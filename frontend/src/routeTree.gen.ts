@@ -14,7 +14,9 @@ import { Route as rootRoute } from './routes/root'
 import { Route as layoutDefaultImport } from './routes/layout-default'
 import { Route as indexImport } from './routes/index'
 import { Route as LoginIndexImport } from './routes/login/index'
+import { Route as SignupFollowupIndexImport } from './routes/signup/followup/index'
 import { Route as LoginEmailSentIndexImport } from './routes/login/emailSent/index'
+import { Route as AuthMagicAuthenticateIndexImport } from './routes/auth/magic/authenticate/index'
 
 // Create/Update Routes
 
@@ -35,11 +37,25 @@ const LoginIndexRoute = LoginIndexImport.update({
   getParentRoute: () => layoutDefaultRoute,
 } as any)
 
+const SignupFollowupIndexRoute = SignupFollowupIndexImport.update({
+  id: '/signup/followup/',
+  path: '/signup/followup/',
+  getParentRoute: () => layoutDefaultRoute,
+} as any)
+
 const LoginEmailSentIndexRoute = LoginEmailSentIndexImport.update({
   id: '/login/emailSent/',
   path: '/login/emailSent/',
   getParentRoute: () => layoutDefaultRoute,
 } as any)
+
+const AuthMagicAuthenticateIndexRoute = AuthMagicAuthenticateIndexImport.update(
+  {
+    id: '/auth/magic/authenticate/',
+    path: '/auth/magic/authenticate/',
+    getParentRoute: () => layoutDefaultRoute,
+  } as any,
+)
 
 // Populate the FileRoutesByPath interface
 
@@ -73,6 +89,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginEmailSentIndexImport
       parentRoute: typeof layoutDefaultImport
     }
+    '/_default/signup/followup/': {
+      id: '/_default/signup/followup/'
+      path: '/signup/followup'
+      fullPath: '/signup/followup'
+      preLoaderRoute: typeof SignupFollowupIndexImport
+      parentRoute: typeof layoutDefaultImport
+    }
+    '/_default/auth/magic/authenticate/': {
+      id: '/_default/auth/magic/authenticate/'
+      path: '/auth/magic/authenticate'
+      fullPath: '/auth/magic/authenticate'
+      preLoaderRoute: typeof AuthMagicAuthenticateIndexImport
+      parentRoute: typeof layoutDefaultImport
+    }
   }
 }
 
@@ -82,12 +112,16 @@ interface layoutDefaultRouteChildren {
   indexRoute: typeof indexRoute
   LoginIndexRoute: typeof LoginIndexRoute
   LoginEmailSentIndexRoute: typeof LoginEmailSentIndexRoute
+  SignupFollowupIndexRoute: typeof SignupFollowupIndexRoute
+  AuthMagicAuthenticateIndexRoute: typeof AuthMagicAuthenticateIndexRoute
 }
 
 const layoutDefaultRouteChildren: layoutDefaultRouteChildren = {
   indexRoute: indexRoute,
   LoginIndexRoute: LoginIndexRoute,
   LoginEmailSentIndexRoute: LoginEmailSentIndexRoute,
+  SignupFollowupIndexRoute: SignupFollowupIndexRoute,
+  AuthMagicAuthenticateIndexRoute: AuthMagicAuthenticateIndexRoute,
 }
 
 const layoutDefaultRouteWithChildren = layoutDefaultRoute._addFileChildren(
@@ -99,12 +133,16 @@ export interface FileRoutesByFullPath {
   '/': typeof indexRoute
   '/login': typeof LoginIndexRoute
   '/login/emailSent': typeof LoginEmailSentIndexRoute
+  '/signup/followup': typeof SignupFollowupIndexRoute
+  '/auth/magic/authenticate': typeof AuthMagicAuthenticateIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof indexRoute
   '/login': typeof LoginIndexRoute
   '/login/emailSent': typeof LoginEmailSentIndexRoute
+  '/signup/followup': typeof SignupFollowupIndexRoute
+  '/auth/magic/authenticate': typeof AuthMagicAuthenticateIndexRoute
 }
 
 export interface FileRoutesById {
@@ -113,19 +151,34 @@ export interface FileRoutesById {
   '/_default/': typeof indexRoute
   '/_default/login/': typeof LoginIndexRoute
   '/_default/login/emailSent/': typeof LoginEmailSentIndexRoute
+  '/_default/signup/followup/': typeof SignupFollowupIndexRoute
+  '/_default/auth/magic/authenticate/': typeof AuthMagicAuthenticateIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/' | '/login' | '/login/emailSent'
+  fullPaths:
+    | ''
+    | '/'
+    | '/login'
+    | '/login/emailSent'
+    | '/signup/followup'
+    | '/auth/magic/authenticate'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/login/emailSent'
+  to:
+    | '/'
+    | '/login'
+    | '/login/emailSent'
+    | '/signup/followup'
+    | '/auth/magic/authenticate'
   id:
     | '__root__'
     | '/_default'
     | '/_default/'
     | '/_default/login/'
     | '/_default/login/emailSent/'
+    | '/_default/signup/followup/'
+    | '/_default/auth/magic/authenticate/'
   fileRoutesById: FileRoutesById
 }
 
@@ -155,7 +208,9 @@ export const routeTree = rootRoute
       "children": [
         "/_default/",
         "/_default/login/",
-        "/_default/login/emailSent/"
+        "/_default/login/emailSent/",
+        "/_default/signup/followup/",
+        "/_default/auth/magic/authenticate/"
       ]
     },
     "/_default/": {
@@ -168,6 +223,14 @@ export const routeTree = rootRoute
     },
     "/_default/login/emailSent/": {
       "filePath": "login/emailSent/index.tsx",
+      "parent": "/_default"
+    },
+    "/_default/signup/followup/": {
+      "filePath": "signup/followup/index.tsx",
+      "parent": "/_default"
+    },
+    "/_default/auth/magic/authenticate/": {
+      "filePath": "auth/magic/authenticate/index.tsx",
       "parent": "/_default"
     }
   }

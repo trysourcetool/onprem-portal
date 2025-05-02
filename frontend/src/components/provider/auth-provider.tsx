@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import type { FC, ReactNode } from 'react';
 import type { User } from '@/api/modules/users';
 import { api } from '@/api';
@@ -8,21 +9,27 @@ import { api } from '@/api';
 type AuthContextType = {
   isAuthorized: boolean;
   account: User | null;
+  handleLogout: () => void;
+  handleAuthorized: () => void;
 };
 
 export const authContext = createContext<AuthContextType>({
   isAuthorized: false,
   account: null,
+  handleLogout: () => {},
+  handleAuthorized: () => {},
 });
 
 export const useAuth = () => {
-  const { isAuthorized, account } = useContext(authContext);
-  return { isAuthorized, account };
+  const { isAuthorized, account, handleLogout, handleAuthorized } =
+    useContext(authContext);
+  return { isAuthorized, account, handleLogout, handleAuthorized };
 };
 
 export const AuthProvider: FC<{ children: ReactNode }> = (props) => {
   const isChecking = useRef<boolean>(false);
   const initialLoading = useRef(false);
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const pathname = useLocation().pathname;
   const navigate = useNavigate();
@@ -33,7 +40,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = (props) => {
     }, 0);
   };
 
-  const { data: account } = useQuery({
+  const { data: account, isLoading: isAccountLoading } = useQuery({
     enabled: isAuthorized,
     queryKey: ['user'],
     queryFn: async () => {
@@ -41,6 +48,22 @@ export const AuthProvider: FC<{ children: ReactNode }> = (props) => {
       return res;
     },
   });
+
+  const logout = useMutation({
+    mutationFn: async () => {
+      await api.auth.logout();
+    },
+    onSuccess: () => {
+      window.location.href = '/login';
+    },
+    onError: () => {
+      toast('Failed to logout - Please try again');
+    },
+  });
+
+  const handleAuthorized = () => {
+    setIsAuthorized(true);
+  };
 
   const handleAuthorizedRoute = () => {
     if (pathname.startsWith('/login')) {
@@ -63,7 +86,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = (props) => {
   };
 
   useEffect(() => {
-    if (isChecking.current || isAuthorized) {
+    if (isChecking.current || isAuthChecked || !isAuthorized) {
       return;
     }
     isChecking.current = true;
@@ -73,14 +96,14 @@ export const AuthProvider: FC<{ children: ReactNode }> = (props) => {
     } else {
       handleUnauthorizedRoute();
     }
-  }, [account, isAuthorized]);
+  }, [account, isAuthorized, isAuthChecked]);
 
   useEffect(() => {
     if (initialLoading.current) return;
     initialLoading.current = true;
     (async () => {
-      const res = await api.auth.refreshToken();
       try {
+        const res = await api.auth.refreshToken();
         if (res.expiresAt) {
           setIsAuthorized(true);
         } else {
@@ -90,6 +113,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = (props) => {
         console.error(error);
         setIsAuthorized(false);
       } finally {
+        setIsAuthChecked(true);
         initialLoading.current = false;
       }
     })();
@@ -100,9 +124,11 @@ export const AuthProvider: FC<{ children: ReactNode }> = (props) => {
       value={{
         isAuthorized,
         account: account?.user ?? null,
+        handleLogout: logout.mutate,
+        handleAuthorized,
       }}
     >
-      {props.children}
+      {isAuthChecked && !isAccountLoading ? props.children : null}
     </authContext.Provider>
   );
 };

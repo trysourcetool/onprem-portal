@@ -51,9 +51,18 @@ export const Route = createRootRoute({
   errorComponent: Fallback,
   notFoundComponent: () => {
     return (
-      <div>
-        <p>This is the notFoundComponent configured on root route</p>
-        <Link to="/">Start Over</Link>
+      <div className="m-auto flex items-center justify-center">
+        <div className="flex max-w-[374px] flex-col gap-6 p-6">
+          <CardHeader className="p-0">
+            <CardTitle>Page not found</CardTitle>
+            <CardDescription>
+              The page you are looking for does not exist.
+            </CardDescription>
+          </CardHeader>
+          <Button asChild>
+            <Link to="/">Back to home</Link>
+          </Button>
+        </div>
       </div>
     );
   },
