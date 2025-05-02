@@ -12,8 +12,9 @@
 
 import { Route as rootRoute } from './routes/root'
 import { Route as layoutDefaultImport } from './routes/layout-default'
-import { Route as loginIndexImport } from './routes/login/index'
 import { Route as indexImport } from './routes/index'
+import { Route as LoginIndexImport } from './routes/login/index'
+import { Route as LoginEmailSentIndexImport } from './routes/login/emailSent/index'
 
 // Create/Update Routes
 
@@ -22,15 +23,21 @@ const layoutDefaultRoute = layoutDefaultImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const loginIndexRoute = loginIndexImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => layoutDefaultRoute,
-} as any)
-
 const indexRoute = indexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => layoutDefaultRoute,
+} as any)
+
+const LoginIndexRoute = LoginIndexImport.update({
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => layoutDefaultRoute,
+} as any)
+
+const LoginEmailSentIndexRoute = LoginEmailSentIndexImport.update({
+  id: '/login/emailSent/',
+  path: '/login/emailSent/',
   getParentRoute: () => layoutDefaultRoute,
 } as any)
 
@@ -52,11 +59,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof indexImport
       parentRoute: typeof layoutDefaultImport
     }
-    '/_default/login': {
-      id: '/_default/login'
+    '/_default/login/': {
+      id: '/_default/login/'
       path: '/login'
       fullPath: '/login'
-      preLoaderRoute: typeof loginIndexImport
+      preLoaderRoute: typeof LoginIndexImport
+      parentRoute: typeof layoutDefaultImport
+    }
+    '/_default/login/emailSent/': {
+      id: '/_default/login/emailSent/'
+      path: '/login/emailSent'
+      fullPath: '/login/emailSent'
+      preLoaderRoute: typeof LoginEmailSentIndexImport
       parentRoute: typeof layoutDefaultImport
     }
   }
@@ -66,12 +80,14 @@ declare module '@tanstack/react-router' {
 
 interface layoutDefaultRouteChildren {
   indexRoute: typeof indexRoute
-  loginIndexRoute: typeof loginIndexRoute
+  LoginIndexRoute: typeof LoginIndexRoute
+  LoginEmailSentIndexRoute: typeof LoginEmailSentIndexRoute
 }
 
 const layoutDefaultRouteChildren: layoutDefaultRouteChildren = {
   indexRoute: indexRoute,
-  loginIndexRoute: loginIndexRoute,
+  LoginIndexRoute: LoginIndexRoute,
+  LoginEmailSentIndexRoute: LoginEmailSentIndexRoute,
 }
 
 const layoutDefaultRouteWithChildren = layoutDefaultRoute._addFileChildren(
@@ -81,27 +97,35 @@ const layoutDefaultRouteWithChildren = layoutDefaultRoute._addFileChildren(
 export interface FileRoutesByFullPath {
   '': typeof layoutDefaultRouteWithChildren
   '/': typeof indexRoute
-  '/login': typeof loginIndexRoute
+  '/login': typeof LoginIndexRoute
+  '/login/emailSent': typeof LoginEmailSentIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof indexRoute
-  '/login': typeof loginIndexRoute
+  '/login': typeof LoginIndexRoute
+  '/login/emailSent': typeof LoginEmailSentIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_default': typeof layoutDefaultRouteWithChildren
   '/_default/': typeof indexRoute
-  '/_default/login': typeof loginIndexRoute
+  '/_default/login/': typeof LoginIndexRoute
+  '/_default/login/emailSent/': typeof LoginEmailSentIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/' | '/login'
+  fullPaths: '' | '/' | '/login' | '/login/emailSent'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login'
-  id: '__root__' | '/_default' | '/_default/' | '/_default/login'
+  to: '/' | '/login' | '/login/emailSent'
+  id:
+    | '__root__'
+    | '/_default'
+    | '/_default/'
+    | '/_default/login/'
+    | '/_default/login/emailSent/'
   fileRoutesById: FileRoutesById
 }
 
@@ -130,15 +154,20 @@ export const routeTree = rootRoute
       "filePath": "layout-default.tsx",
       "children": [
         "/_default/",
-        "/_default/login"
+        "/_default/login/",
+        "/_default/login/emailSent/"
       ]
     },
     "/_default/": {
       "filePath": "index.tsx",
       "parent": "/_default"
     },
-    "/_default/login": {
+    "/_default/login/": {
       "filePath": "login/index.tsx",
+      "parent": "/_default"
+    },
+    "/_default/login/emailSent/": {
+      "filePath": "login/emailSent/index.tsx",
       "parent": "/_default"
     }
   }
