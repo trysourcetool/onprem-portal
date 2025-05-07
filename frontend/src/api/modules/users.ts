@@ -1,13 +1,19 @@
 import * as api from '@/api/instance';
 
+export type License = {
+  id: string;
+  userId: string;
+  key: string;
+};
+
 export type User = {
-  createdAt: string;
-  googleId: string;
+  id: string;
   email: string;
   firstName: string;
-  id: string;
   lastName: string;
+  createdAt: string;
   updatedAt: string;
+  license?: License;
 };
 
 export const getMe = async () => {

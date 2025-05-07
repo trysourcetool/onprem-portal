@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useLocation, useNavigate } from '@tanstack/react-router';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -34,11 +41,11 @@ export const AuthProvider: FC<{ children: ReactNode }> = (props) => {
   const pathname = useLocation().pathname;
   const navigate = useNavigate();
 
-  const checkComplete = () => {
+  const checkComplete = useCallback(() => {
     setTimeout(() => {
       isChecking.current = false;
     }, 0);
-  };
+  }, []);
 
   const { data: account, isLoading: isAccountLoading } = useQuery({
     enabled: isAuthorized,
@@ -65,15 +72,15 @@ export const AuthProvider: FC<{ children: ReactNode }> = (props) => {
     setIsAuthorized(true);
   };
 
-  const handleAuthorizedRoute = () => {
+  const handleAuthorizedRoute = useCallback(() => {
     if (pathname.startsWith('/login')) {
       navigate({ to: '/' });
       checkComplete();
       return;
     }
-  };
+  }, [pathname, navigate, checkComplete]);
 
-  const handleUnauthorizedRoute = () => {
+  const handleUnauthorizedRoute = useCallback(() => {
     if (
       pathname === '/' ||
       (pathname.startsWith('/users') &&
@@ -83,10 +90,10 @@ export const AuthProvider: FC<{ children: ReactNode }> = (props) => {
       checkComplete();
       return;
     }
-  };
+  }, [pathname, navigate, checkComplete]);
 
   useEffect(() => {
-    if (isChecking.current || isAuthChecked || !isAuthorized) {
+    if (isChecking.current || !isAuthChecked) {
       return;
     }
     isChecking.current = true;
@@ -96,7 +103,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = (props) => {
     } else {
       handleUnauthorizedRoute();
     }
-  }, [account, isAuthorized, isAuthChecked]);
+  }, [account, isAuthChecked, handleAuthorizedRoute, handleUnauthorizedRoute]);
 
   useEffect(() => {
     if (initialLoading.current) return;

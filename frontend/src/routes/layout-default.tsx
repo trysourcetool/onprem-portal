@@ -1,9 +1,15 @@
-import { Outlet, createFileRoute } from '@tanstack/react-router';
-import { ChevronsUpDown, LogOut } from 'lucide-react';
+import {
+  Link,
+  Outlet,
+  createFileRoute,
+  useLocation,
+} from '@tanstack/react-router';
+import { ChevronsUpDown, FileText, LogOut } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
   SidebarHeader,
   SidebarInset,
   SidebarMenu,
@@ -27,13 +33,49 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 export default function DefaultLayout() {
   const { account, handleLogout } = useAuth();
-
+  const { pathname } = useLocation();
   return (
     <SidebarProvider>
       {account && (
         <Sidebar collapsible="icon">
-          <SidebarHeader />
-          <SidebarContent></SidebarContent>
+          <SidebarHeader>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground w-full cursor-default"
+                >
+                  <div className="flex flex-1 items-center gap-2 data-[state=open]:px-2 data-[state=open]:py-1">
+                    <Link to={'/'} className="size-8">
+                      <img
+                        src="/images/logo-sidebar.png"
+                        alt="Sourcetool"
+                        className="size-full"
+                      />
+                    </Link>
+                    <div className="flex flex-1 flex-col gap-0.5">
+                      <p className="text-sidebar-foreground text-sm font-semibold">
+                        Sourcetool
+                      </p>
+                    </div>
+                    <ModeToggle />
+                  </div>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarHeader>
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarMenu>
+                <SidebarMenuButton asChild isActive={pathname === '/'}>
+                  <Link to={'/'}>
+                    <FileText />
+                    <span>License Key</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenu>
+            </SidebarGroup>
+          </SidebarContent>
           <SidebarFooter>
             <SidebarMenu>
               <SidebarMenuItem>
@@ -115,7 +157,6 @@ export default function DefaultLayout() {
                 </div>
               )}
             </div>
-            <ModeToggle />
           </div>
         </header>
         <main className="flex flex-1 flex-col px-4 py-6 md:px-6 md:py-6">

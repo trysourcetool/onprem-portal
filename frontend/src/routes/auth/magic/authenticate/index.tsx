@@ -10,13 +10,14 @@ import { object, string } from 'zod';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { api } from '@/api';
+import { useAuth } from '@/components/provider/auth-provider';
 
 export default function MagicLinkAuth() {
   const isInitialLoading = useRef(false);
   const search = useSearch({ from: '/_default/auth/magic/authenticate/' });
   const token = search.token;
   const navigate = useNavigate();
-
+  const { handleAuthorized } = useAuth();
   const mutation = useMutation({
     mutationFn: async (params: { token: string }) => {
       const result = await api.auth.authenticateWithMagicLink({
@@ -26,10 +27,17 @@ export default function MagicLinkAuth() {
       return result;
     },
     onSuccess: (data) => {
-      navigate({
-        to: '/signup/followup',
-        search: { token: data.registrationToken },
-      });
+      if (data.isNewUser) {
+        navigate({
+          to: '/signup/followup',
+          search: { token: data.registrationToken },
+        });
+      } else {
+        handleAuthorized();
+        navigate({
+          to: '/',
+        });
+      }
     },
     onError: () => {
       toast('Failed to authenticate - Please try again');
