@@ -17,6 +17,7 @@ import { Route as LoginIndexImport } from './routes/login/index'
 import { Route as SignupFollowupIndexImport } from './routes/signup/followup/index'
 import { Route as LoginEmailSentIndexImport } from './routes/login/emailSent/index'
 import { Route as AuthMagicAuthenticateIndexImport } from './routes/auth/magic/authenticate/index'
+import { Route as AuthGoogleCallbackIndexImport } from './routes/auth/google/callback/index'
 
 // Create/Update Routes
 
@@ -57,6 +58,12 @@ const AuthMagicAuthenticateIndexRoute = AuthMagicAuthenticateIndexImport.update(
   } as any,
 )
 
+const AuthGoogleCallbackIndexRoute = AuthGoogleCallbackIndexImport.update({
+  id: '/auth/google/callback/',
+  path: '/auth/google/callback/',
+  getParentRoute: () => layoutDefaultRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -96,6 +103,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupFollowupIndexImport
       parentRoute: typeof layoutDefaultImport
     }
+    '/_default/auth/google/callback/': {
+      id: '/_default/auth/google/callback/'
+      path: '/auth/google/callback'
+      fullPath: '/auth/google/callback'
+      preLoaderRoute: typeof AuthGoogleCallbackIndexImport
+      parentRoute: typeof layoutDefaultImport
+    }
     '/_default/auth/magic/authenticate/': {
       id: '/_default/auth/magic/authenticate/'
       path: '/auth/magic/authenticate'
@@ -113,6 +127,7 @@ interface layoutDefaultRouteChildren {
   LoginIndexRoute: typeof LoginIndexRoute
   LoginEmailSentIndexRoute: typeof LoginEmailSentIndexRoute
   SignupFollowupIndexRoute: typeof SignupFollowupIndexRoute
+  AuthGoogleCallbackIndexRoute: typeof AuthGoogleCallbackIndexRoute
   AuthMagicAuthenticateIndexRoute: typeof AuthMagicAuthenticateIndexRoute
 }
 
@@ -121,6 +136,7 @@ const layoutDefaultRouteChildren: layoutDefaultRouteChildren = {
   LoginIndexRoute: LoginIndexRoute,
   LoginEmailSentIndexRoute: LoginEmailSentIndexRoute,
   SignupFollowupIndexRoute: SignupFollowupIndexRoute,
+  AuthGoogleCallbackIndexRoute: AuthGoogleCallbackIndexRoute,
   AuthMagicAuthenticateIndexRoute: AuthMagicAuthenticateIndexRoute,
 }
 
@@ -134,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginIndexRoute
   '/login/emailSent': typeof LoginEmailSentIndexRoute
   '/signup/followup': typeof SignupFollowupIndexRoute
+  '/auth/google/callback': typeof AuthGoogleCallbackIndexRoute
   '/auth/magic/authenticate': typeof AuthMagicAuthenticateIndexRoute
 }
 
@@ -142,6 +159,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginIndexRoute
   '/login/emailSent': typeof LoginEmailSentIndexRoute
   '/signup/followup': typeof SignupFollowupIndexRoute
+  '/auth/google/callback': typeof AuthGoogleCallbackIndexRoute
   '/auth/magic/authenticate': typeof AuthMagicAuthenticateIndexRoute
 }
 
@@ -152,6 +170,7 @@ export interface FileRoutesById {
   '/_default/login/': typeof LoginIndexRoute
   '/_default/login/emailSent/': typeof LoginEmailSentIndexRoute
   '/_default/signup/followup/': typeof SignupFollowupIndexRoute
+  '/_default/auth/google/callback/': typeof AuthGoogleCallbackIndexRoute
   '/_default/auth/magic/authenticate/': typeof AuthMagicAuthenticateIndexRoute
 }
 
@@ -163,6 +182,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/login/emailSent'
     | '/signup/followup'
+    | '/auth/google/callback'
     | '/auth/magic/authenticate'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -170,6 +190,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/login/emailSent'
     | '/signup/followup'
+    | '/auth/google/callback'
     | '/auth/magic/authenticate'
   id:
     | '__root__'
@@ -178,6 +199,7 @@ export interface FileRouteTypes {
     | '/_default/login/'
     | '/_default/login/emailSent/'
     | '/_default/signup/followup/'
+    | '/_default/auth/google/callback/'
     | '/_default/auth/magic/authenticate/'
   fileRoutesById: FileRoutesById
 }
@@ -210,6 +232,7 @@ export const routeTree = rootRoute
         "/_default/login/",
         "/_default/login/emailSent/",
         "/_default/signup/followup/",
+        "/_default/auth/google/callback/",
         "/_default/auth/magic/authenticate/"
       ]
     },
@@ -227,6 +250,10 @@ export const routeTree = rootRoute
     },
     "/_default/signup/followup/": {
       "filePath": "signup/followup/index.tsx",
+      "parent": "/_default"
+    },
+    "/_default/auth/google/callback/": {
+      "filePath": "auth/google/callback/index.tsx",
       "parent": "/_default"
     },
     "/_default/auth/magic/authenticate/": {

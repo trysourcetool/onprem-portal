@@ -37,7 +37,7 @@ export const authenticateWithGoogle = async (params: {
 }) => {
   const res = await api.post<{
     authUrl: string;
-    token: string;
+    registrationToken: string;
     isNewUser: boolean;
   }>({
     path: '/auth/google/authenticate',
