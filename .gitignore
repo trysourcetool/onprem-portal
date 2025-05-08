@@ -111,3 +111,6 @@ terraform.rc
 
 # Repomix
 repomix-output.xml
+
+# IDE
+.vscode/
