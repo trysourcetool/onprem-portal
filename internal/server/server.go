@@ -96,6 +96,15 @@ func (s *Server) installRESTHandlers(router *chi.Mux) {
 					r.Put("/email", s.errorHandler(s.handleUpdateMeEmail))
 				})
 			})
+
+			r.Route("/subscriptions", func(r chi.Router) {
+				r.Use(s.authUser)
+				r.Get("/", s.errorHandler(s.handleGetSubscription))
+				r.Post("/upgrade", s.errorHandler(s.handleUpgradeSubscription))
+				r.Post("/cancel", s.errorHandler(s.handleCancelSubscription))
+			})
+
+			r.Get("/plans", s.errorHandler(s.handleListPlans))
 		})
 	})
 }

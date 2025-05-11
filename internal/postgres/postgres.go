@@ -47,6 +47,14 @@ func (db *db) User() database.UserStore {
 	return newUserStore(internal.NewQueryLogger(db.db))
 }
 
+func (db *db) Plan() database.PlanStore {
+	return newPlanStore(internal.NewQueryLogger(db.db))
+}
+
+func (db *db) Subscription() database.SubscriptionStore {
+	return newSubscriptionStore(internal.NewQueryLogger(db.db))
+}
+
 var _ database.Tx = (*tx)(nil)
 
 type tx struct {
@@ -59,6 +67,14 @@ func (t *tx) License() database.LicenseStore {
 
 func (t *tx) User() database.UserStore {
 	return newUserStore(internal.NewQueryLogger(t.db))
+}
+
+func (t *tx) Plan() database.PlanStore {
+	return newPlanStore(internal.NewQueryLogger(t.db))
+}
+
+func (t *tx) Subscription() database.SubscriptionStore {
+	return newSubscriptionStore(internal.NewQueryLogger(t.db))
 }
 
 func New(sqlxDB *sqlx.DB) database.DB {
