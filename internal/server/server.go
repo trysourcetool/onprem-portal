@@ -64,7 +64,7 @@ func (s *Server) errorHandler(f func(w http.ResponseWriter, r *http.Request) err
 	}
 }
 
-func (s *Server) installRESTHandlers(router *chi.Mux) {
+func (s *Server) installOnpremPortalHandlers(router *chi.Mux) {
 	router.Route("/api", func(r chi.Router) {
 		r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
@@ -124,11 +124,29 @@ func (s *Server) installStaticHandler(router *chi.Mux) {
 	serveStaticFiles(router, staticDir)
 }
 
-func (s *Server) Install(router *chi.Mux) {
+func (s *Server) installLicenseHandlers(router *chi.Mux) {
+	router.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"status": "ok"}`))
+	})
+
+	router.Route("/v1", func(r chi.Router) {
+		r.Use(s.authLicense)
+	})
+}
+
+func (s *Server) InstallOnprePortal(router *chi.Mux) {
 	s.installDefaultMiddlewares(router)
 	s.installCORSMiddleware(router)
-	s.installRESTHandlers(router)
+	s.installOnpremPortalHandlers(router)
 	s.installStaticHandler(router)
+}
+
+func (s *Server) InstallLicense(router *chi.Mux) {
+	s.installDefaultMiddlewares(router)
+	s.installCORSMiddleware(router)
+	s.installLicenseHandlers(router)
 }
 
 func (s *Server) serveError(w http.ResponseWriter, r *http.Request, err error) {

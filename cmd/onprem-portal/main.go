@@ -55,7 +55,7 @@ func main() {
 
 	handler := chi.NewRouter()
 	s := server.New(db, encryptor)
-	s.Install(handler)
+	s.InstallOnprePortal(handler)
 
 	srv := &http.Server{
 		ReadHeaderTimeout: 10 * time.Second,

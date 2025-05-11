@@ -90,3 +90,25 @@ func (s *Server) authUser(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
+
+func (s *Server) authLicense(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		licenseKey := r.Header.Get("Sourcetool-License-Key")
+		if licenseKey == "" {
+			s.serveError(w, r, errdefs.ErrUnauthenticated(errors.New("failed to get license key")))
+			return
+		}
+
+		keyHash := core.HashLicenseKey(licenseKey)
+
+		l, err := s.db.License().GetByKeyHash(ctx, keyHash)
+		if err != nil {
+			s.serveError(w, r, errdefs.ErrUnauthenticated(err))
+			return
+		}
+
+		ctx = context.WithValue(ctx, internal.ContextLicenseKey, l)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
