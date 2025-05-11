@@ -259,7 +259,7 @@ func (s *Server) handleRegisterWithMagicLink(w http.ResponseWriter, r *http.Requ
 		sub := &core.Subscription{
 			ID:         uuid.Must(uuid.NewV4()),
 			UserID:     u.ID,
-			PlanID:     uuid.Nil, // Set to a default/free plan if needed
+			PlanID:     uuid.Nil,
 			Status:     core.SubscriptionStatusTrial,
 			TrialStart: trialStart,
 			TrialEnd:   trialEnd,
