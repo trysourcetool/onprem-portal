@@ -104,6 +104,16 @@ func (s *Server) installRESTHandlers(router *chi.Mux) {
 				r.Post("/cancel", s.errorHandler(s.handleCancelSubscription))
 			})
 
+			r.Route("/stripe", func(r chi.Router) {
+				r.Group(func(r chi.Router) {
+					r.Use(s.authUser)
+					r.Post("/createCheckoutSession", s.errorHandler(s.handleCreateCheckoutSession))
+					r.Get("/customerPortalUrl", s.errorHandler(s.handleGetCustomerPortalUrl))
+				})
+
+				r.Post("/webhook", s.errorHandler(s.handleStripeWebhook))
+			})
+
 			r.Get("/plans", s.errorHandler(s.handleListPlans))
 		})
 	})

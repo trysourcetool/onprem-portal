@@ -42,6 +42,10 @@ type config struct {
 		FromEmail string `env:"SMTP_FROM_EMAIL"`
 		UseTLS    bool   `env:"SMTP_USE_TLS"`
 	}
+	Stripe struct {
+		Key           string `env:"STRIPE_KEY"`
+		WebhookSecret string `env:"STRIPE_WEBHOOK_SECRET"`
+	}
 }
 
 func Init() {

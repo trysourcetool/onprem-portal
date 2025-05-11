@@ -12,6 +12,7 @@ import (
 type SubscriptionStore interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*core.Subscription, error)
 	GetByUserID(ctx context.Context, userID uuid.UUID) (*core.Subscription, error)
+	GetByStripeSubscriptionID(ctx context.Context, stripeSubID string) (*core.Subscription, error)
 	Create(ctx context.Context, s *core.Subscription) error
 	Update(ctx context.Context, s *core.Subscription) error
 	DeleteByID(ctx context.Context, id uuid.UUID) error

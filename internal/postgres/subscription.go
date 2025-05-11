@@ -108,3 +108,19 @@ func (s *subscriptionStore) ListExpiredTrial(ctx context.Context, before time.Ti
 	}
 	return subs, nil
 }
+
+func (s *subscriptionStore) GetByStripeSubscriptionID(ctx context.Context, stripeSubID string) (*core.Subscription, error) {
+	query, args, err := s.builder.
+		Select("id", "user_id", "plan_id", "status", "stripe_customer_id", "stripe_subscription_id", "trial_start", "trial_end", "created_at", "updated_at").
+		From(`subscription`).
+		Where(sq.Eq{"stripe_subscription_id": stripeSubID}).
+		ToSql()
+	if err != nil {
+		return nil, err
+	}
+	var sub core.Subscription
+	if err := s.db.GetContext(ctx, &sub, query, args...); err != nil {
+		return nil, err
+	}
+	return &sub, nil
+}
