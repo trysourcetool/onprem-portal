@@ -133,6 +133,7 @@ func (s *Server) installLicenseHandlers(router *chi.Mux) {
 
 	router.Route("/v1", func(r chi.Router) {
 		r.Use(s.authLicense)
+		r.Post("/seats", s.errorHandler(s.handleUpdateSeats))
 	})
 }
 

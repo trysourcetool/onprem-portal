@@ -2,11 +2,14 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/stripe/stripe-go/v82"
+	"github.com/stripe/stripe-go/v82/billing/meterevent"
 	billingportal "github.com/stripe/stripe-go/v82/billingportal/session"
 	checkout "github.com/stripe/stripe-go/v82/checkout/session"
 	"github.com/stripe/stripe-go/v82/customer"
@@ -192,4 +195,42 @@ func (s *Server) handleStripeWebhook(w http.ResponseWriter, r *http.Request) err
 		// ignore other events
 	}
 	return s.renderJSON(w, http.StatusOK, statusResponse{Code: http.StatusOK, Message: "ok"})
+}
+
+type updateSeatsRequest struct {
+	Seats int64 `json:"seats" validate:"required"`
+}
+
+func (s *Server) handleUpdateSeats(w http.ResponseWriter, r *http.Request) error {
+	ctx := r.Context()
+	var req updateSeatsRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return errdefs.ErrInvalidArgument(err)
+	}
+	if err := validateRequest(req); err != nil {
+		return err
+	}
+	license := internal.ContextLicense(ctx)
+	if license == nil {
+		return errdefs.ErrUnauthenticated(fmt.Errorf("license not found in context"))
+	}
+	sub, err := s.db.Subscription().GetByUserID(ctx, license.UserID)
+	if err != nil {
+		return err
+	}
+	if sub.StripeCustomerID == "" {
+		return errdefs.ErrInternal(fmt.Errorf("stripe customer id not found for user"))
+	}
+	params := &stripe.BillingMeterEventParams{
+		EventName: stripe.String("seats"),
+		Payload: map[string]string{
+			"value":              strconv.FormatInt(req.Seats, 10),
+			"stripe_customer_id": sub.StripeCustomerID,
+		},
+	}
+	_, err = meterevent.New(params)
+	if err != nil {
+		return errdefs.ErrInternal(err)
+	}
+	return s.renderJSON(w, http.StatusOK, statusResponse{Code: 0, Message: "ok"})
 }
