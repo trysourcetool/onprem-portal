@@ -54,7 +54,7 @@ func SubscriptionStatusFromString(s string) SubscriptionStatus {
 type Subscription struct {
 	ID                   uuid.UUID
 	UserID               uuid.UUID
-	PlanID               uuid.UUID
+	PlanID               *uuid.UUID
 	Status               SubscriptionStatus
 	StripeCustomerID     string
 	StripeSubscriptionID string

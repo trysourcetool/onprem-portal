@@ -25,9 +25,9 @@ func newPlanStore(db internal.DB) database.PlanStore {
 
 func (s *planStore) GetByID(ctx context.Context, id uuid.UUID) (*core.Plan, error) {
 	query, args, err := s.builder.
-		Select("id", "name", "price", "stripe_price_id", "created_at", "updated_at").
-		From(`plan`).
-		Where(sq.Eq{"id": id}).
+		Select(`p."id"`, `p."name"`, `p."price"`, `p."stripe_price_id"`, `p."created_at"`, `p."updated_at"`).
+		From(`"plan" p`).
+		Where(sq.Eq{`p."id"`: id}).
 		ToSql()
 	if err != nil {
 		return nil, err
@@ -41,8 +41,8 @@ func (s *planStore) GetByID(ctx context.Context, id uuid.UUID) (*core.Plan, erro
 
 func (s *planStore) List(ctx context.Context) ([]*core.Plan, error) {
 	query, args, err := s.builder.
-		Select("id", "name", "price", "stripe_price_id", "created_at", "updated_at").
-		From(`plan`).
+		Select(`p."id"`, `p."name"`, `p."price"`, `p."stripe_price_id"`, `p."created_at"`, `p."updated_at"`).
+		From(`"plan" p`).
 		ToSql()
 	if err != nil {
 		return nil, err

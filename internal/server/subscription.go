@@ -30,9 +30,15 @@ func subscriptionFromModel(s *core.Subscription) *subscriptionResponse {
 		return nil
 	}
 	return &subscriptionResponse{
-		ID:                   s.ID.String(),
-		UserID:               s.UserID.String(),
-		PlanID:               s.PlanID.String(),
+		ID:     s.ID.String(),
+		UserID: s.UserID.String(),
+		PlanID: func() string {
+			if s.PlanID != nil {
+				return s.PlanID.String()
+			} else {
+				return ""
+			}
+		}(),
 		Status:               s.Status.String(),
 		StripeCustomerID:     s.StripeCustomerID,
 		StripeSubscriptionID: s.StripeSubscriptionID,
@@ -77,7 +83,7 @@ func (s *Server) handleUpgradeSubscription(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		return err
 	}
-	sub.PlanID = planID
+	sub.PlanID = &planID
 	sub.Status = core.SubscriptionStatusActive
 	if err := s.db.Subscription().Update(ctx, sub); err != nil {
 		return err

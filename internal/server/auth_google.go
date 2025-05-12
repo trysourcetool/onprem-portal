@@ -240,7 +240,7 @@ func (s *Server) handleRegisterWithGoogle(w http.ResponseWriter, r *http.Request
 		sub := &core.Subscription{
 			ID:         uuid.Must(uuid.NewV4()),
 			UserID:     u.ID,
-			PlanID:     uuid.Nil,
+			PlanID:     nil,
 			Status:     core.SubscriptionStatusTrial,
 			TrialStart: trialStart,
 			TrialEnd:   trialEnd,

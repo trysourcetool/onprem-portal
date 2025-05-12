@@ -89,7 +89,7 @@ INSERT INTO "subscription_status" ("code", "name") VALUES
 CREATE TABLE "subscription" (
   "id"                     UUID         NOT NULL,
   "user_id"                UUID         NOT NULL,
-  "plan_id"                UUID         NOT NULL,
+  "plan_id"                UUID,
   "stripe_customer_id"     VARCHAR(255) NOT NULL,
   "stripe_subscription_id" VARCHAR(255) NOT NULL,
   "status"                 INTEGER      NOT NULL,
