@@ -42,7 +42,7 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8081"
+		port = "8082"
 		logger.Logger.Info(fmt.Sprintf("Defaulting to port %s\n", port))
 	}
 

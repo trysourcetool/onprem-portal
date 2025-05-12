@@ -52,16 +52,16 @@ func SubscriptionStatusFromString(s string) SubscriptionStatus {
 }
 
 type Subscription struct {
-	ID                   uuid.UUID
-	UserID               uuid.UUID
-	PlanID               *uuid.UUID
-	Status               SubscriptionStatus
-	StripeCustomerID     string
-	StripeSubscriptionID string
-	TrialStart           time.Time
-	TrialEnd             time.Time
-	CreatedAt            time.Time
-	UpdatedAt            time.Time
+	ID                   uuid.UUID          `db:"id"`
+	UserID               uuid.UUID          `db:"user_id"`
+	PlanID               *uuid.UUID         `db:"plan_id"`
+	Status               SubscriptionStatus `db:"status"`
+	StripeCustomerID     string             `db:"stripe_customer_id"`
+	StripeSubscriptionID string             `db:"stripe_subscription_id"`
+	TrialStart           time.Time          `db:"trial_start"`
+	TrialEnd             time.Time          `db:"trial_end"`
+	CreatedAt            time.Time          `db:"created_at"`
+	UpdatedAt            time.Time          `db:"updated_at"`
 }
 
 func (s *Subscription) IsTrial() bool {

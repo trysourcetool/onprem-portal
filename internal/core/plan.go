@@ -7,10 +7,10 @@ import (
 )
 
 type Plan struct {
-	ID            uuid.UUID
-	Name          string
-	Price         int
-	StripePriceID string
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
+	ID            uuid.UUID `db:"id"`
+	Name          string    `db:"name"`
+	Price         int       `db:"price"`
+	StripePriceID string    `db:"stripe_price_id"`
+	CreatedAt     time.Time `db:"created_at"`
+	UpdatedAt     time.Time `db:"updated_at"`
 }
