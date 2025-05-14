@@ -79,6 +79,9 @@ func (s *Server) handleCreateCheckoutSession(w http.ResponseWriter, r *http.Requ
 				Quantity: stripe.Int64(max(sub.SeatCount, 1)),
 			},
 		},
+		AutomaticTax: &stripe.CheckoutSessionAutomaticTaxParams{
+			Enabled: stripe.Bool(true),
+		},
 		SuccessURL: stripe.String(config.Config.BaseURL + "/settings/billing"),
 		CancelURL:  stripe.String(config.Config.BaseURL + "/settings/billing"),
 	}
