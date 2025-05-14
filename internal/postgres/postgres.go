@@ -23,7 +23,7 @@ type db struct {
 }
 
 func (db *db) WithTx(ctx context.Context, fn func(tx database.Tx) error) error {
-	sqlxTx, err := db.db.Beginx()
+	sqlxTx, err := db.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return err
 	}

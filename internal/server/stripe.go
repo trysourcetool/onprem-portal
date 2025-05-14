@@ -5,19 +5,20 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strconv"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/stripe/stripe-go/v82"
-	"github.com/stripe/stripe-go/v82/billing/meterevent"
 	billingportal "github.com/stripe/stripe-go/v82/billingportal/session"
 	checkout "github.com/stripe/stripe-go/v82/checkout/session"
 	"github.com/stripe/stripe-go/v82/customer"
+	"github.com/stripe/stripe-go/v82/subscription"
+	"github.com/stripe/stripe-go/v82/subscriptionitem"
 	"github.com/stripe/stripe-go/v82/webhook"
 
 	"github.com/trysourcetool/onprem-portal/internal"
 	"github.com/trysourcetool/onprem-portal/internal/config"
 	"github.com/trysourcetool/onprem-portal/internal/core"
+	"github.com/trysourcetool/onprem-portal/internal/database"
 	"github.com/trysourcetool/onprem-portal/internal/errdefs"
 )
 
@@ -75,7 +76,7 @@ func (s *Server) handleCreateCheckoutSession(w http.ResponseWriter, r *http.Requ
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
 			{
 				Price:    stripe.String(plan.StripePriceID),
-				Quantity: stripe.Int64(1),
+				Quantity: stripe.Int64(max(sub.SeatCount, 1)),
 			},
 		},
 		SuccessURL: stripe.String(config.Config.BaseURL + "/settings/billing"),
@@ -218,19 +219,49 @@ func (s *Server) handleUpdateSeats(w http.ResponseWriter, r *http.Request) error
 	if err != nil {
 		return err
 	}
-	if sub.StripeCustomerID == "" {
-		return errdefs.ErrInternal(fmt.Errorf("stripe customer id not found for user"))
-	}
-	params := &stripe.BillingMeterEventParams{
-		EventName: stripe.String("seats"),
-		Payload: map[string]string{
-			"value":              strconv.FormatInt(req.Seats, 10),
-			"stripe_customer_id": sub.StripeCustomerID,
-		},
-	}
-	_, err = meterevent.New(params)
+
+	stripeSub, err := subscription.Get(sub.StripeSubscriptionID, nil)
 	if err != nil {
 		return errdefs.ErrInternal(err)
+	}
+	if stripeSub.Items == nil || len(stripeSub.Items.Data) == 0 {
+		return errdefs.ErrInternal(fmt.Errorf("stripe subscription items not found for user"))
+	}
+
+	if err := s.db.WithTx(ctx, func(tx database.Tx) error {
+		seatCount, err := tx.Subscription().UpdateSeatCount(ctx, sub.ID, req.Seats)
+		if err != nil {
+			return err
+		}
+
+		if sub.IsTrial() {
+			return nil
+		}
+		if sub.IsPastDue() {
+			return errdefs.ErrInternal(fmt.Errorf("subscription is past due"))
+		}
+		if sub.IsCanceled() {
+			return errdefs.ErrInternal(fmt.Errorf("subscription is canceled"))
+		}
+		if sub.StripeCustomerID == "" {
+			return errdefs.ErrInternal(fmt.Errorf("stripe customer id not found for user"))
+		}
+		if sub.StripeSubscriptionID == "" {
+			return errdefs.ErrInternal(fmt.Errorf("stripe subscription id not found for user"))
+		}
+
+		stripe.Key = config.Config.Stripe.Key
+		params := &stripe.SubscriptionItemParams{
+			Quantity: stripe.Int64(seatCount),
+		}
+		_, err = subscriptionitem.Update(stripeSub.Items.Data[0].ID, params)
+		if err != nil {
+			return errdefs.ErrInternal(err)
+		}
+
+		return nil
+	}); err != nil {
+		return err
 	}
 	return s.renderJSON(w, http.StatusOK, statusResponse{Code: 0, Message: "ok"})
 }

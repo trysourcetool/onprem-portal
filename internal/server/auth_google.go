@@ -244,6 +244,7 @@ func (s *Server) handleRegisterWithGoogle(w http.ResponseWriter, r *http.Request
 			Status:     core.SubscriptionStatusTrial,
 			TrialStart: trialStart,
 			TrialEnd:   trialEnd,
+			SeatCount:  1,
 		}
 		if err := tx.Subscription().Create(ctx, sub); err != nil {
 			return err

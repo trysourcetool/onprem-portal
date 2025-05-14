@@ -95,6 +95,7 @@ CREATE TABLE "subscription" (
   "status"                 INTEGER      NOT NULL,
   "trial_start"            TIMESTAMPTZ  NOT NULL,
   "trial_end"              TIMESTAMPTZ  NOT NULL,
+  "seat_count"             INTEGER      NOT NULL DEFAULT 1,
   "created_at"             TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at"             TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY ("user_id") REFERENCES "user" ("id") ON DELETE CASCADE,

@@ -15,6 +15,7 @@ type SubscriptionStore interface {
 	GetByStripeSubscriptionID(ctx context.Context, stripeSubID string) (*core.Subscription, error)
 	Create(ctx context.Context, s *core.Subscription) error
 	Update(ctx context.Context, s *core.Subscription) error
+	UpdateSeatCount(ctx context.Context, subID uuid.UUID, addSeatCount int64) (int64, error)
 	DeleteByID(ctx context.Context, id uuid.UUID) error
 	ListExpiredTrial(ctx context.Context, before time.Time) ([]*core.Subscription, error)
 }

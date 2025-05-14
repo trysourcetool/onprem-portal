@@ -263,6 +263,7 @@ func (s *Server) handleRegisterWithMagicLink(w http.ResponseWriter, r *http.Requ
 			Status:     core.SubscriptionStatusTrial,
 			TrialStart: trialStart,
 			TrialEnd:   trialEnd,
+			SeatCount:  1,
 		}
 		if err := tx.Subscription().Create(ctx, sub); err != nil {
 			return err

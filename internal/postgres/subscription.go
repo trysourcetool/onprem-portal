@@ -26,7 +26,7 @@ func newSubscriptionStore(db internal.DB) database.SubscriptionStore {
 
 func (s *subscriptionStore) GetByID(ctx context.Context, id uuid.UUID) (*core.Subscription, error) {
 	query, args, err := s.builder.
-		Select(`s."id"`, `s."user_id"`, `s."plan_id"`, `s."status"`, `s."stripe_customer_id"`, `s."stripe_subscription_id"`, `s."trial_start"`, `s."trial_end"`, `s."created_at"`, `s."updated_at"`).
+		Select(`s."id"`, `s."user_id"`, `s."plan_id"`, `s."status"`, `s."stripe_customer_id"`, `s."stripe_subscription_id"`, `s."trial_start"`, `s."trial_end"`, `s."seat_count"`, `s."created_at"`, `s."updated_at"`).
 		From(`"subscription" s`).
 		Where(sq.Eq{`s."id"`: id}).
 		ToSql()
@@ -42,7 +42,7 @@ func (s *subscriptionStore) GetByID(ctx context.Context, id uuid.UUID) (*core.Su
 
 func (s *subscriptionStore) GetByUserID(ctx context.Context, userID uuid.UUID) (*core.Subscription, error) {
 	query, args, err := s.builder.
-		Select(`s."id"`, `s."user_id"`, `s."plan_id"`, `s."status"`, `s."stripe_customer_id"`, `s."stripe_subscription_id"`, `s."trial_start"`, `s."trial_end"`, `s."created_at"`, `s."updated_at"`).
+		Select(`s."id"`, `s."user_id"`, `s."plan_id"`, `s."status"`, `s."stripe_customer_id"`, `s."stripe_subscription_id"`, `s."trial_start"`, `s."trial_end"`, `s."seat_count"`, `s."created_at"`, `s."updated_at"`).
 		From(`"subscription" s`).
 		Where(sq.Eq{`s."user_id"`: userID}).
 		ToSql()
@@ -59,8 +59,8 @@ func (s *subscriptionStore) GetByUserID(ctx context.Context, userID uuid.UUID) (
 func (s *subscriptionStore) Create(ctx context.Context, sub *core.Subscription) error {
 	_, err := s.builder.
 		Insert(`"subscription"`).
-		Columns(`"id"`, `"user_id"`, `"plan_id"`, `"status"`, `"stripe_customer_id"`, `"stripe_subscription_id"`, `"trial_start"`, `"trial_end"`).
-		Values(sub.ID, sub.UserID, sub.PlanID, sub.Status, sub.StripeCustomerID, sub.StripeSubscriptionID, sub.TrialStart, sub.TrialEnd).
+		Columns(`"id"`, `"user_id"`, `"plan_id"`, `"status"`, `"stripe_customer_id"`, `"stripe_subscription_id"`, `"trial_start"`, `"trial_end"`, `"seat_count"`).
+		Values(sub.ID, sub.UserID, sub.PlanID, sub.Status, sub.StripeCustomerID, sub.StripeSubscriptionID, sub.TrialStart, sub.TrialEnd, sub.SeatCount).
 		RunWith(s.db).
 		ExecContext(ctx)
 	return err
@@ -75,10 +75,30 @@ func (s *subscriptionStore) Update(ctx context.Context, sub *core.Subscription) 
 		Set(`"stripe_subscription_id"`, sub.StripeSubscriptionID).
 		Set(`"trial_start"`, sub.TrialStart).
 		Set(`"trial_end"`, sub.TrialEnd).
+		Set(`"seat_count"`, sub.SeatCount).
 		Where(sq.Eq{`"id"`: sub.ID}).
 		RunWith(s.db).
 		ExecContext(ctx)
 	return err
+}
+
+func (s *subscriptionStore) UpdateSeatCount(ctx context.Context, subID uuid.UUID, addSeatCount int64) (int64, error) {
+	query, args, err := s.builder.
+		Update(`"subscription"`).
+		Set(`"seat_count"`, sq.Expr(`"seat_count" + ?`, addSeatCount)).
+		Where(sq.Eq{`"id"`: subID}).
+		Suffix(`RETURNING "seat_count"`).
+		ToSql()
+	if err != nil {
+		return 0, err
+	}
+
+	var count int64
+	if err := s.db.QueryRowxContext(ctx, query, args...).Scan(&count); err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }
 
 func (s *subscriptionStore) DeleteByID(ctx context.Context, id uuid.UUID) error {
@@ -92,7 +112,7 @@ func (s *subscriptionStore) DeleteByID(ctx context.Context, id uuid.UUID) error 
 
 func (s *subscriptionStore) ListExpiredTrial(ctx context.Context, before time.Time) ([]*core.Subscription, error) {
 	query, args, err := s.builder.
-		Select(`s."id"`, `s."user_id"`, `s."plan_id"`, `s."status"`, `s."stripe_customer_id"`, `s."stripe_subscription_id"`, `s."trial_start"`, `s."trial_end"`, `s."created_at"`, `s."updated_at"`).
+		Select(`s."id"`, `s."user_id"`, `s."plan_id"`, `s."status"`, `s."stripe_customer_id"`, `s."stripe_subscription_id"`, `s."trial_start"`, `s."trial_end"`, `s."seat_count"`, `s."created_at"`, `s."updated_at"`).
 		From(`"subscription" s`).
 		Where(sq.And{
 			sq.Eq{`s."status"`: int(core.SubscriptionStatusTrial)},
@@ -111,7 +131,7 @@ func (s *subscriptionStore) ListExpiredTrial(ctx context.Context, before time.Ti
 
 func (s *subscriptionStore) GetByStripeSubscriptionID(ctx context.Context, stripeSubID string) (*core.Subscription, error) {
 	query, args, err := s.builder.
-		Select(`s."id"`, `s."user_id"`, `s."plan_id"`, `s."status"`, `s."stripe_customer_id"`, `s."stripe_subscription_id"`, `s."trial_start"`, `s."trial_end"`, `s."created_at"`, `s."updated_at"`).
+		Select(`s."id"`, `s."user_id"`, `s."plan_id"`, `s."status"`, `s."stripe_customer_id"`, `s."stripe_subscription_id"`, `s."trial_start"`, `s."trial_end"`, `s."seat_count"`, `s."created_at"`, `s."updated_at"`).
 		From(`"subscription" s`).
 		Where(sq.Eq{`s."stripe_subscription_id"`: stripeSubID}).
 		ToSql()

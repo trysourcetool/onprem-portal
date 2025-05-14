@@ -60,6 +60,7 @@ type Subscription struct {
 	StripeSubscriptionID string             `db:"stripe_subscription_id"`
 	TrialStart           time.Time          `db:"trial_start"`
 	TrialEnd             time.Time          `db:"trial_end"`
+	SeatCount            int64              `db:"seat_count"`
 	CreatedAt            time.Time          `db:"created_at"`
 	UpdatedAt            time.Time          `db:"updated_at"`
 }
