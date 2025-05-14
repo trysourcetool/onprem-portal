@@ -93,7 +93,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = (props) => {
   }, [pathname, navigate, checkComplete]);
 
   useEffect(() => {
-    if (isChecking.current || !isAuthChecked) {
+    if (isChecking.current || !isAuthChecked || isAccountLoading) {
       return;
     }
     isChecking.current = true;
@@ -103,7 +103,13 @@ export const AuthProvider: FC<{ children: ReactNode }> = (props) => {
     } else {
       handleUnauthorizedRoute();
     }
-  }, [account, isAuthChecked, handleAuthorizedRoute, handleUnauthorizedRoute]);
+  }, [
+    account,
+    isAuthChecked,
+    handleAuthorizedRoute,
+    handleUnauthorizedRoute,
+    isAccountLoading,
+  ]);
 
   useEffect(() => {
     if (initialLoading.current) return;

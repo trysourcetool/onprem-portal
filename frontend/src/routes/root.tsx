@@ -10,6 +10,7 @@ import type { ErrorComponentProps } from '@tanstack/react-router';
 import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AuthProvider } from '@/components/provider/auth-provider';
+import { BreadcrumbsProvider } from '@/hooks/use-breadcrumbs';
 
 function Fallback(props: ErrorComponentProps) {
   const navigate = useNavigate();
@@ -38,8 +39,10 @@ export default function App() {
     <>
       <ThemeProvider enableSystem={false} attribute="class">
         <AuthProvider>
-          <Outlet />
-          <TanStackRouterDevtools position="bottom-right" />
+          <BreadcrumbsProvider>
+            <Outlet />
+            <TanStackRouterDevtools position="bottom-right" />
+          </BreadcrumbsProvider>
         </AuthProvider>
       </ThemeProvider>
     </>
