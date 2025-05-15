@@ -9,33 +9,22 @@ import { api } from '@/api';
 type SubscriptionContextType = {
   subscription: Subscription | null;
   upgradeSubscription: (planId: string) => void;
-  cancelSubscription: () => void;
   isUpgrading: boolean;
-  isCancelling: boolean;
 };
 
 export const subscriptionContext = createContext<SubscriptionContextType>({
   subscription: null,
   upgradeSubscription: () => {},
-  cancelSubscription: () => {},
   isUpgrading: false,
-  isCancelling: false,
 });
 
 export const useSubscription = () => {
-  const {
-    subscription,
-    upgradeSubscription,
-    cancelSubscription,
-    isUpgrading,
-    isCancelling,
-  } = useContext(subscriptionContext);
+  const { subscription, upgradeSubscription, isUpgrading } =
+    useContext(subscriptionContext);
   return {
     subscription,
     upgradeSubscription,
-    cancelSubscription,
     isUpgrading,
-    isCancelling,
   };
 };
 
@@ -57,21 +46,12 @@ export const SubscriptionProvider: FC<{ children: ReactNode }> = (props) => {
     },
   });
 
-  const cancelSubscription = useMutation({
-    mutationFn: () => api.subscriptions.cancelSubscription(),
-    onSuccess: () => {
-      refetch();
-    },
-  });
-
   return (
     <subscriptionContext.Provider
       value={{
         subscription: subscription?.subscription ?? null,
         upgradeSubscription: upgradeSubscription.mutate,
         isUpgrading: upgradeSubscription.isPending,
-        cancelSubscription: cancelSubscription.mutate,
-        isCancelling: cancelSubscription.isPending,
       }}
     >
       {props.children}

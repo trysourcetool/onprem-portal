@@ -72,13 +72,7 @@ export default function Index() {
 
   console.log({ plans });
 
-  const {
-    subscription,
-    upgradeSubscription,
-    cancelSubscription,
-    isUpgrading,
-    isCancelling,
-  } = useSubscription();
+  const { subscription, upgradeSubscription, isUpgrading } = useSubscription();
   const { setBreadcrumbsState } = useBreadcrumbs();
 
   console.log({ subscription });
@@ -118,7 +112,7 @@ export default function Index() {
               buttonLabel="Read documentation"
               onClick={() => {}}
               features={['Up to 5 users', 'Unlimited apps']}
-              buttonDisabled={isUpgrading || isCancelling}
+              buttonDisabled={isUpgrading}
             />
           </div>
           <div className="relative flex max-w-[296px] flex-1 flex-col [&>*]:flex-1">
@@ -134,7 +128,7 @@ export default function Index() {
               onClick={() => {}}
               features={['Staging Environment Available', 'More than 5 users']}
               isPopular
-              buttonDisabled={isUpgrading || isCancelling}
+              buttonDisabled={isUpgrading}
             />
           </div>
           <div className="relative flex max-w-[296px] flex-1 flex-col [&>*]:flex-1">
@@ -152,7 +146,7 @@ export default function Index() {
                 'Unlimited Environments',
                 'Audit Logs',
               ]}
-              buttonDisabled={isUpgrading || isCancelling}
+              buttonDisabled={isUpgrading}
             />
           </div>
         </div>

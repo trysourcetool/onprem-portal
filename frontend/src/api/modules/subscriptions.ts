@@ -39,12 +39,3 @@ export const upgradeSubscription = async (params: {
 
   return res;
 };
-
-export const cancelSubscription = async () => {
-  const res = await api.post({
-    path: '/subscriptions/cancel',
-    auth: true,
-  });
-
-  return res;
-};
