@@ -13,17 +13,15 @@ import (
 )
 
 type subscriptionResponse struct {
-	ID                   string        `json:"id"`
-	UserID               string        `json:"userId"`
-	PlanID               string        `json:"planId"`
-	Status               string        `json:"status"`
-	StripeCustomerID     string        `json:"stripeCustomerId"`
-	StripeSubscriptionID string        `json:"stripeSubscriptionId"`
-	TrialStart           string        `json:"trialStart"`
-	TrialEnd             string        `json:"trialEnd"`
-	CreatedAt            string        `json:"createdAt"`
-	UpdatedAt            string        `json:"updatedAt"`
-	Plan                 *planResponse `json:"plan"`
+	ID         string        `json:"id"`
+	UserID     string        `json:"userId"`
+	PlanID     string        `json:"planId"`
+	Status     string        `json:"status"`
+	TrialStart string        `json:"trialStart"`
+	TrialEnd   string        `json:"trialEnd"`
+	CreatedAt  string        `json:"createdAt"`
+	UpdatedAt  string        `json:"updatedAt"`
+	Plan       *planResponse `json:"plan"`
 }
 
 func subscriptionFromModel(sub *core.Subscription, plan *core.Plan) *subscriptionResponse {
@@ -45,12 +43,11 @@ func subscriptionFromModel(sub *core.Subscription, plan *core.Plan) *subscriptio
 			}
 			return nil
 		}(),
-		StripeCustomerID:     sub.StripeCustomerID,
-		StripeSubscriptionID: sub.StripeSubscriptionID,
-		TrialStart:           strconv.FormatInt(sub.TrialStart.Unix(), 10),
-		TrialEnd:             strconv.FormatInt(sub.TrialEnd.Unix(), 10),
-		CreatedAt:            strconv.FormatInt(sub.CreatedAt.Unix(), 10),
-		UpdatedAt:            strconv.FormatInt(sub.UpdatedAt.Unix(), 10),
+		Status:     sub.Status.String(),
+		TrialStart: strconv.FormatInt(sub.TrialStart.Unix(), 10),
+		TrialEnd:   strconv.FormatInt(sub.TrialEnd.Unix(), 10),
+		CreatedAt:  strconv.FormatInt(sub.CreatedAt.Unix(), 10),
+		UpdatedAt:  strconv.FormatInt(sub.UpdatedAt.Unix(), 10),
 	}
 }
 

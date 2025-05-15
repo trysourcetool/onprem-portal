@@ -73,8 +73,8 @@ CREATE TRIGGER update_plan_updated_at
     EXECUTE FUNCTION update_updated_at_column();
 
 INSERT INTO "plan" ("id", "name", "price", "stripe_price_id") VALUES
-  (gen_random_uuid(), 'Team', 10, 'team'),
-  (gen_random_uuid(), 'Business', 24, 'business');
+  (gen_random_uuid(), 'Team', 10, 'price_1RNXs507QE3crwMYYSFnC4WZ'),
+  (gen_random_uuid(), 'Business', 24, 'price_1RNXz907QE3crwMY2ZlTpV5R');
 
 -- subscription table
 CREATE TABLE "subscription_status" (

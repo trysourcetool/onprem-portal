@@ -8,12 +8,11 @@ import (
 )
 
 type planResponse struct {
-	ID            string  `json:"id"`
-	Name          string  `json:"name"`
-	Price         float64 `json:"price"`
-	StripePriceID string  `json:"stripePriceId"`
-	CreatedAt     string  `json:"createdAt"`
-	UpdatedAt     string  `json:"updatedAt"`
+	ID        string  `json:"id"`
+	Name      string  `json:"name"`
+	Price     float64 `json:"price"`
+	CreatedAt string  `json:"createdAt"`
+	UpdatedAt string  `json:"updatedAt"`
 }
 
 type listPlansResponse struct {
@@ -25,12 +24,11 @@ func planFromModel(p *core.Plan) *planResponse {
 		return nil
 	}
 	return &planResponse{
-		ID:            p.ID.String(),
-		Name:          p.Name,
-		Price:         p.Price,
-		StripePriceID: p.StripePriceID,
-		CreatedAt:     strconv.FormatInt(p.CreatedAt.Unix(), 10),
-		UpdatedAt:     strconv.FormatInt(p.UpdatedAt.Unix(), 10),
+		ID:        p.ID.String(),
+		Name:      p.Name,
+		Price:     p.Price,
+		CreatedAt: strconv.FormatInt(p.CreatedAt.Unix(), 10),
+		UpdatedAt: strconv.FormatInt(p.UpdatedAt.Unix(), 10),
 	}
 }
 
