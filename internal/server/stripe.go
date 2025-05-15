@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -173,18 +174,10 @@ func (s *Server) handleStripeWebhook(w http.ResponseWriter, r *http.Request) err
 			sub.Status = core.SubscriptionStatusTrial
 		case "canceled":
 			sub.Status = core.SubscriptionStatusCanceled
-			u, err := s.db.User().GetByID(ctx, sub.UserID)
-			if err == nil && u != nil {
-				u.SetScheduledDeletionAt()
-				_ = s.db.User().Update(ctx, u)
-			}
+			_ = s.scheduleUserDeletion(ctx, sub.UserID)
 		case "past_due":
 			sub.Status = core.SubscriptionStatusPastDue
-			u, err := s.db.User().GetByID(ctx, sub.UserID)
-			if err == nil && u != nil {
-				u.SetScheduledDeletionAt()
-				_ = s.db.User().Update(ctx, u)
-			}
+			_ = s.scheduleUserDeletion(ctx, sub.UserID)
 		default:
 			sub.Status = core.SubscriptionStatusUnknown
 		}
@@ -205,11 +198,7 @@ func (s *Server) handleStripeWebhook(w http.ResponseWriter, r *http.Request) err
 		if err := s.db.Subscription().Update(ctx, sub); err != nil {
 			break
 		}
-		u, err := s.db.User().GetByID(ctx, sub.UserID)
-		if err == nil && u != nil {
-			u.SetScheduledDeletionAt()
-			_ = s.db.User().Update(ctx, u)
-		}
+		_ = s.scheduleUserDeletion(ctx, sub.UserID)
 	default:
 		// ignore other events
 	}
@@ -282,4 +271,13 @@ func (s *Server) handleUpdateSeats(w http.ResponseWriter, r *http.Request) error
 		return err
 	}
 	return s.renderJSON(w, http.StatusOK, statusResponse{Code: 0, Message: "ok"})
+}
+
+func (s *Server) scheduleUserDeletion(ctx context.Context, userID uuid.UUID) error {
+	u, err := s.db.User().GetByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	u.SetScheduledDeletionAt()
+	return s.db.User().Update(ctx, u)
 }
