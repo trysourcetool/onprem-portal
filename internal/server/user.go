@@ -25,7 +25,7 @@ type userResponse struct {
 	LastName            string           `json:"lastName"`
 	CreatedAt           string           `json:"createdAt"`
 	UpdatedAt           string           `json:"updatedAt"`
-	ScheduledDeletionAt *string          `json:"scheduledDeletionAt,omitempty"`
+	ScheduledDeletionAt *string          `json:"scheduledDeletionAt"`
 	License             *licenseResponse `json:"license,omitempty"`
 }
 
