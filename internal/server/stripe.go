@@ -173,8 +173,18 @@ func (s *Server) handleStripeWebhook(w http.ResponseWriter, r *http.Request) err
 			sub.Status = core.SubscriptionStatusTrial
 		case "canceled":
 			sub.Status = core.SubscriptionStatusCanceled
+			u, err := s.db.User().GetByID(ctx, sub.UserID)
+			if err == nil && u != nil {
+				u.SetScheduledDeletionAt()
+				_ = s.db.User().Update(ctx, u)
+			}
 		case "past_due":
 			sub.Status = core.SubscriptionStatusPastDue
+			u, err := s.db.User().GetByID(ctx, sub.UserID)
+			if err == nil && u != nil {
+				u.SetScheduledDeletionAt()
+				_ = s.db.User().Update(ctx, u)
+			}
 		default:
 			sub.Status = core.SubscriptionStatusUnknown
 		}
@@ -194,6 +204,11 @@ func (s *Server) handleStripeWebhook(w http.ResponseWriter, r *http.Request) err
 		sub.Status = core.SubscriptionStatusCanceled
 		if err := s.db.Subscription().Update(ctx, sub); err != nil {
 			break
+		}
+		u, err := s.db.User().GetByID(ctx, sub.UserID)
+		if err == nil && u != nil {
+			u.SetScheduledDeletionAt()
+			_ = s.db.User().Update(ctx, u)
 		}
 	default:
 		// ignore other events

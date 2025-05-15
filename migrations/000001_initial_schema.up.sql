@@ -13,14 +13,15 @@ $$ LANGUAGE plpgsql;
 
 -- user table
 CREATE TABLE "user" (
-  "id"                 UUID          NOT NULL,
-  "email"              VARCHAR(255)  NOT NULL,
-  "first_name"         VARCHAR(255)  NOT NULL,
-  "last_name"          VARCHAR(255)  NOT NULL,
-  "refresh_token_hash" VARCHAR(255)  NOT NULL,
-  "google_id"          VARCHAR(255)  NOT NULL,
-  "created_at"         TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  "updated_at"         TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "id"                    UUID         NOT NULL,
+  "email"                 VARCHAR(255) NOT NULL,
+  "first_name"            VARCHAR(255) NOT NULL,
+  "last_name"             VARCHAR(255) NOT NULL,
+  "refresh_token_hash"    VARCHAR(255) NOT NULL,
+  "google_id"             VARCHAR(255) NOT NULL,
+  "scheduled_deletion_at" TIMESTAMPTZ  DEFAULT NULL,
+  "created_at"            TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at"            TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY ("id")
 );
 

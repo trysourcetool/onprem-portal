@@ -19,13 +19,14 @@ import (
 )
 
 type userResponse struct {
-	ID        string           `json:"id"`
-	Email     string           `json:"email"`
-	FirstName string           `json:"firstName"`
-	LastName  string           `json:"lastName"`
-	CreatedAt string           `json:"createdAt"`
-	UpdatedAt string           `json:"updatedAt"`
-	License   *licenseResponse `json:"license,omitempty"`
+	ID                  string           `json:"id"`
+	Email               string           `json:"email"`
+	FirstName           string           `json:"firstName"`
+	LastName            string           `json:"lastName"`
+	CreatedAt           string           `json:"createdAt"`
+	UpdatedAt           string           `json:"updatedAt"`
+	ScheduledDeletionAt *string          `json:"scheduledDeletionAt,omitempty"`
+	License             *licenseResponse `json:"license,omitempty"`
 }
 
 func (s *Server) userFromModel(user *core.User, l *core.License) *userResponse {
@@ -33,14 +34,21 @@ func (s *Server) userFromModel(user *core.User, l *core.License) *userResponse {
 		return nil
 	}
 
+	var scheduledDeletionAt *string
+	if user.ScheduledDeletionAt != nil {
+		v := strconv.FormatInt(user.ScheduledDeletionAt.Unix(), 10)
+		scheduledDeletionAt = &v
+	}
+
 	return &userResponse{
-		ID:        user.ID.String(),
-		Email:     user.Email,
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-		CreatedAt: strconv.FormatInt(user.CreatedAt.Unix(), 10),
-		UpdatedAt: strconv.FormatInt(user.UpdatedAt.Unix(), 10),
-		License:   s.licenseFromModel(l),
+		ID:                  user.ID.String(),
+		Email:               user.Email,
+		FirstName:           user.FirstName,
+		LastName:            user.LastName,
+		CreatedAt:           strconv.FormatInt(user.CreatedAt.Unix(), 10),
+		UpdatedAt:           strconv.FormatInt(user.UpdatedAt.Unix(), 10),
+		ScheduledDeletionAt: scheduledDeletionAt,
+		License:             s.licenseFromModel(l),
 	}
 }
 

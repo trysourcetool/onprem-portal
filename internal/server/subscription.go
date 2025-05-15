@@ -114,5 +114,9 @@ func (s *Server) handleCancelSubscription(w http.ResponseWriter, r *http.Request
 	if err := s.db.Subscription().Update(ctx, sub); err != nil {
 		return err
 	}
+	ctxUser.SetScheduledDeletionAt()
+	if err := s.db.User().Update(ctx, ctxUser); err != nil {
+		return err
+	}
 	return s.renderJSON(w, http.StatusOK, statusResponse{Code: http.StatusOK, Message: "Subscription canceled"})
 }
