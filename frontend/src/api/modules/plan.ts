@@ -4,7 +4,7 @@ export type Plan = {
   id: string;
   name: string;
   price: number;
-  stripePriceID: string;
+  stripePriceId: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -16,6 +16,8 @@ export const getPlans = async () => {
     path: '/plans',
     auth: true,
   });
+
+  console.log({ res });
 
   return res;
 };

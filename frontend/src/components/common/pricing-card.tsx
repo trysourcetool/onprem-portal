@@ -2,6 +2,17 @@ import { Check } from 'lucide-react';
 import clsx from 'clsx';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '../ui/alert-dialog';
 import type { FC } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -10,21 +21,23 @@ export const PricingCard: FC<{
   description: string;
   price: number;
   period?: string;
-  buttonLabel: string;
-  onClick: () => void;
+  onDialogSubmit?: () => void;
   features: Array<string>;
   isPopular?: boolean;
   buttonDisabled?: boolean;
+  buttonType: 'docs' | 'dialog';
+  isCurrentPlan?: boolean;
 }> = ({
   title,
   description,
   price,
   period,
-  buttonLabel,
-  onClick,
+  onDialogSubmit,
   features,
   isPopular = false,
   buttonDisabled = false,
+  buttonType,
+  isCurrentPlan = false,
 }) => {
   return (
     <Card
@@ -45,9 +58,48 @@ export const PricingCard: FC<{
               <span className="text-muted-foreground text-base">/{period}</span>
             )}
           </div>
-          <Button onClick={onClick} disabled={buttonDisabled}>
-            {buttonLabel}
-          </Button>
+          {buttonType === 'docs' && (
+            <Button
+              disabled={buttonDisabled}
+              asChild
+              className="cursor-pointer"
+            >
+              <a target="_blank" rel="noreferrer">
+                Read documentation
+              </a>
+            </Button>
+          )}
+          {buttonType === 'dialog' && (
+            <AlertDialog>
+              <AlertDialogTrigger
+                disabled={isCurrentPlan || buttonDisabled}
+                asChild
+              >
+                <Button className="cursor-pointer">
+                  {isCurrentPlan ? 'Current Plan' : 'Upgrade'}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Upgrade your plan</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    You are about to upgrade to Business plan.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="cursor-pointer">
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={onDialogSubmit}
+                    className="cursor-pointer"
+                  >
+                    Upgrade
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
         <div className="flex flex-col gap-4">
           {features.map((feature) => (

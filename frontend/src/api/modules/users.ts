@@ -13,7 +13,8 @@ export type User = {
   lastName: string;
   createdAt: string;
   updatedAt: string;
-  license?: License;
+  scheduledDeletionAt: string | null;
+  license: License | null;
 };
 
 export const getMe = async () => {

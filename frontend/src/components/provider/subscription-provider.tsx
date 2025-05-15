@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
+import { toast } from 'sonner';
 import { useAuth } from './auth-provider';
 import type { FC, ReactNode } from 'react';
 import type { Subscription } from '@/api/modules/subscriptions';
@@ -43,6 +44,10 @@ export const SubscriptionProvider: FC<{ children: ReactNode }> = (props) => {
       }),
     onSuccess: () => {
       refetch();
+    },
+    onError: (error) => {
+      console.error(error);
+      toast.error('Failed to upgrade subscription');
     },
   });
 
