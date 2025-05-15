@@ -1,13 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import clsx from 'clsx';
+import { useQuery } from '@tanstack/react-query';
 import type { FC } from 'react';
 
 import { PageHeader } from '@/components/common/page-header';
 import { useBreadcrumbs } from '@/hooks/use-breadcrumbs';
 import { useAuth } from '@/components/provider/auth-provider';
-import { checkAccountExpiredDays } from '@/lib/account';
+import { checkAccountExpiredDays, checkTrialExpiredDays } from '@/lib/account';
 import { PricingCard } from '@/components/common/pricing-card';
+import { useSubscription } from '@/components/provider/subscription-provider';
+import { api } from '@/api';
 
 const VerticalLine: FC<{
   className?: string;
@@ -61,7 +64,24 @@ const HorizontalLine: FC<{
 
 export default function Index() {
   const { account } = useAuth();
+  const { data: plans } = useQuery({
+    enabled: !!account,
+    queryKey: ['plans'],
+    queryFn: () => api.plan.getPlans(),
+  });
+
+  console.log({ plans });
+
+  const {
+    subscription,
+    upgradeSubscription,
+    cancelSubscription,
+    isUpgrading,
+    isCancelling,
+  } = useSubscription();
   const { setBreadcrumbsState } = useBreadcrumbs();
+
+  console.log({ subscription });
 
   useEffect(() => {
     setBreadcrumbsState?.([{ label: 'Pricing', to: '/pricing' }]);
@@ -71,17 +91,16 @@ export default function Index() {
     <div>
       <PageHeader label="Pricing" />
       <div className="flex w-screen flex-col gap-4 px-4 py-6 md:w-auto md:gap-8 md:px-6">
-        {account && (
+        {account && subscription && (
           <div className="flex justify-center">
             <div className="bg-accent relative flex flex-col gap-2.5 rounded-md border p-10 text-center">
               <p className="font-bold">
-                You're currently on a{' '}
-                {checkAccountExpiredDays(account).trialExpiredDays}-day free
-                trial
+                You're currently on a {checkTrialExpiredDays(subscription)}-day
+                free trial
               </p>
               <p className="text-xs">
                 You must select one of our plans within{' '}
-                {checkAccountExpiredDays(account).expiredDays} days.
+                {checkAccountExpiredDays(account)} days.
               </p>
               <VerticalLine className="top-full" />
             </div>
@@ -99,6 +118,7 @@ export default function Index() {
               buttonLabel="Read documentation"
               onClick={() => {}}
               features={['Up to 5 users', 'Unlimited apps']}
+              buttonDisabled={isUpgrading || isCancelling}
             />
           </div>
           <div className="relative flex max-w-[296px] flex-1 flex-col [&>*]:flex-1">
@@ -114,6 +134,7 @@ export default function Index() {
               onClick={() => {}}
               features={['Staging Environment Available', 'More than 5 users']}
               isPopular
+              buttonDisabled={isUpgrading || isCancelling}
             />
           </div>
           <div className="relative flex max-w-[296px] flex-1 flex-col [&>*]:flex-1">
@@ -131,6 +152,7 @@ export default function Index() {
                 'Unlimited Environments',
                 'Audit Logs',
               ]}
+              buttonDisabled={isUpgrading || isCancelling}
             />
           </div>
         </div>

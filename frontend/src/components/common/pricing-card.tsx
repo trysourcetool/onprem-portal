@@ -14,6 +14,7 @@ export const PricingCard: FC<{
   onClick: () => void;
   features: Array<string>;
   isPopular?: boolean;
+  buttonDisabled?: boolean;
 }> = ({
   title,
   description,
@@ -23,6 +24,7 @@ export const PricingCard: FC<{
   onClick,
   features,
   isPopular = false,
+  buttonDisabled = false,
 }) => {
   return (
     <Card
@@ -43,7 +45,9 @@ export const PricingCard: FC<{
               <span className="text-muted-foreground text-base">/{period}</span>
             )}
           </div>
-          <Button onClick={onClick}>{buttonLabel}</Button>
+          <Button onClick={onClick} disabled={buttonDisabled}>
+            {buttonLabel}
+          </Button>
         </div>
         <div className="flex flex-col gap-4">
           {features.map((feature) => (

@@ -6,11 +6,13 @@ import {
 } from '@tanstack/react-router';
 import { ThemeProvider } from 'next-themes';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import type { ErrorComponentProps } from '@tanstack/react-router';
 import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AuthProvider } from '@/components/provider/auth-provider';
 import { BreadcrumbsProvider } from '@/hooks/use-breadcrumbs';
+import { SubscriptionProvider } from '@/components/provider/subscription-provider';
 
 function Fallback(props: ErrorComponentProps) {
   const navigate = useNavigate();
@@ -39,10 +41,13 @@ export default function App() {
     <>
       <ThemeProvider enableSystem={false} attribute="class">
         <AuthProvider>
-          <BreadcrumbsProvider>
-            <Outlet />
-            <TanStackRouterDevtools position="bottom-right" />
-          </BreadcrumbsProvider>
+          <SubscriptionProvider>
+            <BreadcrumbsProvider>
+              <Outlet />
+              <TanStackRouterDevtools position="bottom-left" />
+              <ReactQueryDevtools />
+            </BreadcrumbsProvider>
+          </SubscriptionProvider>
         </AuthProvider>
       </ThemeProvider>
     </>

@@ -13,6 +13,8 @@ import {
   SquareArrowOutUpRight,
 } from 'lucide-react';
 import { Fragment } from 'react/jsx-runtime';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import {
   Sidebar,
   SidebarContent,
@@ -48,11 +50,25 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { useBreadcrumbs } from '@/hooks/use-breadcrumbs';
+import { api } from '@/api';
 
 export default function DefaultLayout() {
   const { account, handleLogout } = useAuth();
   const { pathname } = useLocation();
   const { breadcrumbsState } = useBreadcrumbs();
+
+  const stripePortalUrl = useMutation({
+    mutationFn: async () => {
+      const res = await api.stripe.getCustomerPortalUrl();
+      return res;
+    },
+    onSuccess: (data) => {
+      window.location.href = data.url;
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   return (
     <SidebarProvider>
@@ -104,7 +120,10 @@ export default function DefaultLayout() {
               </SidebarMenu>
               <SidebarMenu>
                 <SidebarMenuButton asChild>
-                  <a className="flex items-center">
+                  <a
+                    className="flex items-center"
+                    onClick={() => stripePortalUrl.mutate()}
+                  >
                     <ReceiptText />
                     <span className="flex-1">Manage Billing</span>
                     <SquareArrowOutUpRight className="text-muted-foreground" />

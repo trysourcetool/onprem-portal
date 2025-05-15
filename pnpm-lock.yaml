@@ -81,7 +81,7 @@ importers:
         specifier: ^5.66.5
         version: 5.74.11(react@19.1.0)
       '@tanstack/react-query-devtools':
-        specifier: ^5.66.5
+        specifier: ^5.74.11
         version: 5.74.11(@tanstack/react-query@5.74.11(react@19.1.0))(react@19.1.0)
       '@tanstack/react-router':
         specifier: ^1.114.3
