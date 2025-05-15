@@ -13,39 +13,44 @@ import (
 )
 
 type subscriptionResponse struct {
-	ID                   string `json:"id"`
-	UserID               string `json:"userId"`
-	PlanID               string `json:"planId"`
-	Status               string `json:"status"`
-	StripeCustomerID     string `json:"stripeCustomerId"`
-	StripeSubscriptionID string `json:"stripeSubscriptionId"`
-	TrialStart           string `json:"trialStart"`
-	TrialEnd             string `json:"trialEnd"`
-	CreatedAt            string `json:"createdAt"`
-	UpdatedAt            string `json:"updatedAt"`
+	ID                   string        `json:"id"`
+	UserID               string        `json:"userId"`
+	PlanID               string        `json:"planId"`
+	Status               string        `json:"status"`
+	StripeCustomerID     string        `json:"stripeCustomerId"`
+	StripeSubscriptionID string        `json:"stripeSubscriptionId"`
+	TrialStart           string        `json:"trialStart"`
+	TrialEnd             string        `json:"trialEnd"`
+	CreatedAt            string        `json:"createdAt"`
+	UpdatedAt            string        `json:"updatedAt"`
+	Plan                 *planResponse `json:"plan"`
 }
 
-func subscriptionFromModel(s *core.Subscription) *subscriptionResponse {
-	if s == nil {
+func subscriptionFromModel(sub *core.Subscription, plan *core.Plan) *subscriptionResponse {
+	if sub == nil {
 		return nil
 	}
 	return &subscriptionResponse{
-		ID:     s.ID.String(),
-		UserID: s.UserID.String(),
+		ID:     sub.ID.String(),
+		UserID: sub.UserID.String(),
 		PlanID: func() string {
-			if s.PlanID != nil {
-				return s.PlanID.String()
-			} else {
-				return ""
+			if sub.PlanID != nil {
+				return sub.PlanID.String()
 			}
+			return ""
 		}(),
-		Status:               s.Status.String(),
-		StripeCustomerID:     s.StripeCustomerID,
-		StripeSubscriptionID: s.StripeSubscriptionID,
-		TrialStart:           strconv.FormatInt(s.TrialStart.Unix(), 10),
-		TrialEnd:             strconv.FormatInt(s.TrialEnd.Unix(), 10),
-		CreatedAt:            strconv.FormatInt(s.CreatedAt.Unix(), 10),
-		UpdatedAt:            strconv.FormatInt(s.UpdatedAt.Unix(), 10),
+		Plan: func() *planResponse {
+			if plan != nil {
+				return planFromModel(plan)
+			}
+			return nil
+		}(),
+		StripeCustomerID:     sub.StripeCustomerID,
+		StripeSubscriptionID: sub.StripeSubscriptionID,
+		TrialStart:           strconv.FormatInt(sub.TrialStart.Unix(), 10),
+		TrialEnd:             strconv.FormatInt(sub.TrialEnd.Unix(), 10),
+		CreatedAt:            strconv.FormatInt(sub.CreatedAt.Unix(), 10),
+		UpdatedAt:            strconv.FormatInt(sub.UpdatedAt.Unix(), 10),
 	}
 }
 
@@ -60,7 +65,14 @@ func (s *Server) handleGetSubscription(w http.ResponseWriter, r *http.Request) e
 	if err != nil {
 		return err
 	}
-	resp := &getSubscriptionResponse{Subscription: subscriptionFromModel(sub)}
+	var plan *core.Plan
+	if sub.PlanID != nil {
+		plan, err = s.db.Plan().GetByID(ctx, *sub.PlanID)
+		if err != nil {
+			return err
+		}
+	}
+	resp := &getSubscriptionResponse{Subscription: subscriptionFromModel(sub, plan)}
 	return s.renderJSON(w, http.StatusOK, resp)
 }
 

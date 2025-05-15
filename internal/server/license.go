@@ -48,11 +48,18 @@ func (s *Server) handleValidateLicense(w http.ResponseWriter, r *http.Request) e
 	if err != nil {
 		return errdefs.ErrLicenseNotFound(err)
 	}
+	var plan *core.Plan
+	if sub.PlanID != nil {
+		plan, err = s.db.Plan().GetByID(ctx, *sub.PlanID)
+		if err != nil {
+			return err
+		}
+	}
 	valid := sub.IsActive() || sub.IsTrial()
 	resp := &licenseValidityResponse{
 		Valid:        valid,
 		Status:       sub.Status.String(),
-		Subscription: subscriptionFromModel(sub),
+		Subscription: subscriptionFromModel(sub, plan),
 	}
 	return s.renderJSON(w, http.StatusOK, resp)
 }
