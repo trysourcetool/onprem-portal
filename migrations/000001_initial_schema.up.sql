@@ -1,5 +1,7 @@
 BEGIN;
 
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- Function to automatically update updated_at columns
 CREATE OR REPLACE FUNCTION update_updated_at_column() 
 RETURNS TRIGGER AS $$
@@ -53,12 +55,12 @@ CREATE TRIGGER update_license_updated_at
 
 -- plan table
 CREATE TABLE "plan" (
-  "id"              UUID         NOT NULL,
-  "name"            VARCHAR(255) NOT NULL,
-  "price"           INTEGER      NOT NULL,
-  "stripe_price_id" VARCHAR(255) NOT NULL,
-  "created_at"      TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  "updated_at"      TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "id"              UUID          NOT NULL,
+  "name"            VARCHAR(255)  NOT NULL,
+  "price"           NUMERIC(10,2) NOT NULL,
+  "stripe_price_id" VARCHAR(255)  NOT NULL,
+  "created_at"      TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at"      TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY ("id")
 );
 
@@ -68,6 +70,10 @@ CREATE TRIGGER update_plan_updated_at
     BEFORE UPDATE ON "plan"
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+INSERT INTO "plan" ("id", "name", "price", "stripe_price_id") VALUES
+  (gen_random_uuid(), 'Team', 10, 'team'),
+  (gen_random_uuid(), 'Business', 24, 'business');
 
 -- subscription table
 CREATE TABLE "subscription_status" (
