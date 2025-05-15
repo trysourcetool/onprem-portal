@@ -122,6 +122,7 @@ func (s *userStore) Create(ctx context.Context, u *core.User) error {
 			`"last_name"`,
 			`"refresh_token_hash"`,
 			`"google_id"`,
+			`"scheduled_deletion_at"`,
 		).
 		Values(
 			u.ID,
@@ -130,6 +131,7 @@ func (s *userStore) Create(ctx context.Context, u *core.User) error {
 			u.LastName,
 			u.RefreshTokenHash,
 			u.GoogleID,
+			u.ScheduledDeletionAt,
 		).
 		RunWith(s.db).
 		ExecContext(ctx); err != nil {
@@ -150,6 +152,7 @@ func (s *userStore) Update(ctx context.Context, u *core.User) error {
 		Set(`"last_name"`, u.LastName).
 		Set(`"refresh_token_hash"`, u.RefreshTokenHash).
 		Set(`"google_id"`, u.GoogleID).
+		Set(`"scheduled_deletion_at"`, u.ScheduledDeletionAt).
 		Where(sq.Eq{`"id"`: u.ID}).
 		RunWith(s.db).
 		ExecContext(ctx); err != nil {
@@ -177,6 +180,7 @@ func (s *userStore) columns() []string {
 		`u."last_name"`,
 		`u."google_id"`,
 		`u."refresh_token_hash"`,
+		`u."scheduled_deletion_at"`,
 		`u."created_at"`,
 		`u."updated_at"`,
 	}
