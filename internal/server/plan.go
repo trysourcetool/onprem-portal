@@ -8,12 +8,12 @@ import (
 )
 
 type planResponse struct {
-	ID            string `json:"id"`
-	Name          string `json:"name"`
-	Price         int    `json:"price"`
-	StripePriceID string `json:"stripePriceId"`
-	CreatedAt     string `json:"createdAt"`
-	UpdatedAt     string `json:"updatedAt"`
+	ID            string  `json:"id"`
+	Name          string  `json:"name"`
+	Price         float64 `json:"price"`
+	StripePriceID string  `json:"stripePriceId"`
+	CreatedAt     string  `json:"createdAt"`
+	UpdatedAt     string  `json:"updatedAt"`
 }
 
 type listPlansResponse struct {
