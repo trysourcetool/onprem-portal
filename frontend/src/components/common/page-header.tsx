@@ -1,4 +1,5 @@
 import { AlertCircle, Clock } from 'lucide-react';
+import clsx from 'clsx';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { useAuth } from '../provider/auth-provider';
 import { useSubscription } from '../provider/subscription-provider';
@@ -29,7 +30,13 @@ export const PageHeader: FC<{
         )}
       </div>
       {subscription?.status === 'trial' && (
-        <Alert variant={isTrialEnd ? 'destructive' : 'default'}>
+        <Alert
+          variant={isTrialEnd ? 'destructive' : 'default'}
+          className={clsx(
+            'rounded-none border-none',
+            isTrialEnd ? 'bg-destructive/10' : 'bg-muted',
+          )}
+        >
           {!isTrialEnd && <Clock className="h-4 w-4" />}
           {isTrialEnd && <AlertCircle className="h-4 w-4" />}
           <AlertTitle>
@@ -38,9 +45,15 @@ export const PageHeader: FC<{
               : 'You are currently on a free trial.'}
           </AlertTitle>
           <AlertDescription>
-            {isTrialEnd
-              ? `Your free account will be permanently deleted after 30 days - upgrade now to prevent deletion.`
-              : 'Your trial will end in xx days. To continue using all features after day 14, please upgrade.  Learn more about pricing here.'}
+            {isTrialEnd ? (
+              `Your free account will be permanently deleted after 30 days - upgrade now to prevent deletion.`
+            ) : (
+              <span>
+                Your trial will end in xx days. To continue using all features
+                after day 14, please upgrade.{' '}
+                <a className="font-bold">Learn more about pricing here.</a>
+              </span>
+            )}
           </AlertDescription>
         </Alert>
       )}
