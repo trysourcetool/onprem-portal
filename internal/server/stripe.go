@@ -109,6 +109,7 @@ func (s *Server) handleGetCustomerPortalUrl(w http.ResponseWriter, r *http.Reque
 func (s *Server) handleStripeWebhook(w http.ResponseWriter, r *http.Request) error {
 	const MaxBodyBytes = int64(65536)
 	r.Body = http.MaxBytesReader(w, r.Body, MaxBodyBytes)
+	defer r.Body.Close()
 	payload, err := io.ReadAll(r.Body)
 	if err != nil {
 		return s.renderJSON(w, http.StatusServiceUnavailable, statusResponse{Code: http.StatusServiceUnavailable, Message: "Read error"})
