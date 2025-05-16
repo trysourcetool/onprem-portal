@@ -65,6 +65,11 @@ func (s *Server) handleCreateCheckoutSession(w http.ResponseWriter, r *http.Requ
 		AutomaticTax: &stripe.CheckoutSessionAutomaticTaxParams{
 			Enabled: stripe.Bool(true),
 		},
+		SubscriptionData: &stripe.CheckoutSessionSubscriptionDataParams{
+			Metadata: map[string]string{
+				"user_id": ctxUser.ID.String(),
+			},
+		},
 		SuccessURL: stripe.String(config.Config.BaseURL + "/settings/billing"),
 		CancelURL:  stripe.String(config.Config.BaseURL + "/settings/billing"),
 	}
@@ -119,26 +124,38 @@ func (s *Server) handleStripeWebhook(w http.ResponseWriter, r *http.Request) err
 	}
 
 	switch event.Type {
-	case "checkout.session.completed":
-		var session stripe.CheckoutSession
-		if err := json.Unmarshal(event.Data.Raw, &session); err != nil {
+	case "customer.subscription.created":
+		var subObj stripe.Subscription
+		if err := json.Unmarshal(event.Data.Raw, &subObj); err != nil {
 			break
 		}
-		if session.Subscription == nil || session.Customer == nil {
+		if subObj.Items == nil || subObj.Items.Data == nil || len(subObj.Items.Data) == 0 {
 			break
 		}
 		ctx := r.Context()
-		plan, err := s.db.Plan().GetByStripePriceID(ctx, session.LineItems.Data[0].Price.ID)
+		userID := subObj.Metadata["user_id"]
+		if userID == "" {
+			break
+		}
+		userUUID, err := uuid.FromString(userID)
 		if err != nil {
 			break
 		}
-		sub, err := s.db.Subscription().GetByStripeSubscriptionID(ctx, session.Subscription.ID)
+		u, err := s.db.User().GetByID(ctx, userUUID)
+		if err != nil {
+			break
+		}
+		plan, err := s.db.Plan().GetByStripePriceID(ctx, subObj.Items.Data[0].Price.ID)
+		if err != nil {
+			break
+		}
+		sub, err := s.db.Subscription().GetByUserID(ctx, u.ID)
 		if err != nil {
 			break
 		}
 		sub.Status = core.SubscriptionStatusActive
-		sub.StripeCustomerID = session.Customer.ID
-		sub.StripeSubscriptionID = session.Subscription.ID
+		sub.StripeCustomerID = subObj.Customer.ID
+		sub.StripeSubscriptionID = subObj.ID
 		sub.PlanID = &plan.ID
 		if err := s.db.Subscription().Update(ctx, sub); err != nil {
 			break
