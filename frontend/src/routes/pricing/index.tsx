@@ -37,10 +37,8 @@ export default function Index() {
     },
   });
 
-  const teamPlan = plans?.plans.find((plan) => plan.stripePriceId === 'team');
-  const businessPlan = plans?.plans.find(
-    (plan) => plan.stripePriceId === 'business',
-  );
+  const teamPlan = plans?.plans.find((plan) => plan.name === 'Team');
+  const businessPlan = plans?.plans.find((plan) => plan.name === 'Business');
 
   useEffect(() => {
     setBreadcrumbsState?.([{ label: 'Pricing', to: '/pricing' }]);

@@ -4,7 +4,6 @@ export type Plan = {
   id: string;
   name: string;
   price: number;
-  stripePriceId: string;
   createdAt: string;
   updatedAt: string;
 };
