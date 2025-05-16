@@ -128,6 +128,10 @@ func (s *Server) handleStripeWebhook(w http.ResponseWriter, r *http.Request) err
 			break
 		}
 		ctx := r.Context()
+		plan, err := s.db.Plan().GetByStripePriceID(ctx, session.LineItems.Data[0].Price.ID)
+		if err != nil {
+			break
+		}
 		sub, err := s.db.Subscription().GetByStripeSubscriptionID(ctx, session.Subscription.ID)
 		if err != nil {
 			break
@@ -135,6 +139,7 @@ func (s *Server) handleStripeWebhook(w http.ResponseWriter, r *http.Request) err
 		sub.Status = core.SubscriptionStatusActive
 		sub.StripeCustomerID = session.Customer.ID
 		sub.StripeSubscriptionID = session.Subscription.ID
+		sub.PlanID = &plan.ID
 		if err := s.db.Subscription().Update(ctx, sub); err != nil {
 			break
 		}
@@ -144,10 +149,15 @@ func (s *Server) handleStripeWebhook(w http.ResponseWriter, r *http.Request) err
 			break
 		}
 		ctx := r.Context()
+		plan, err := s.db.Plan().GetByStripePriceID(ctx, subObj.Items.Data[0].Price.ID)
+		if err != nil {
+			break
+		}
 		sub, err := s.db.Subscription().GetByStripeSubscriptionID(ctx, subObj.ID)
 		if err != nil {
 			break
 		}
+		sub.PlanID = &plan.ID
 		// Update status based on Stripe subscription status
 		switch subObj.Status {
 		case "active":

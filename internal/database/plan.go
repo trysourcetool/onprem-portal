@@ -10,5 +10,6 @@ import (
 
 type PlanStore interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*core.Plan, error)
+	GetByStripePriceID(ctx context.Context, stripePriceID string) (*core.Plan, error)
 	List(ctx context.Context) ([]*core.Plan, error)
 }
