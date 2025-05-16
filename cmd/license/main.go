@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	_ "github.com/lib/pq"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
@@ -41,21 +40,15 @@ func main() {
 		logger.Logger.Fatal("failed to create encryptor", zap.Error(err))
 	}
 
-	// if config.Config.Env == config.EnvLocal {
-	// 	if err := internal.LoadFixtures(ctx, db); err != nil {
-	// 		logger.Logger.Fatal(err.Error())
-	// 	}
-	// }
-
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8081"
+		port = "8082"
 		logger.Logger.Info(fmt.Sprintf("Defaulting to port %s\n", port))
 	}
 
 	handler := chi.NewRouter()
 	s := server.New(db, encryptor)
-	s.InstallOnprePortal(handler)
+	s.InstallLicense(handler)
 
 	srv := &http.Server{
 		ReadHeaderTimeout: 10 * time.Second,
@@ -67,7 +60,7 @@ func main() {
 
 	eg, egCtx := errgroup.WithContext(ctx)
 	eg.Go(func() error {
-		logger.Logger.Info(fmt.Sprintf("Listening on port %s\n", port))
+		logger.Logger.Info(fmt.Sprintf("License server listening on port %s\n", port))
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			return fmt.Errorf("HTTP server error: %v", err)
 		}
@@ -75,12 +68,11 @@ func main() {
 	})
 	eg.Go(func() error {
 		<-egCtx.Done()
-		logger.Logger.Info("Shutting down server...")
+		logger.Logger.Info("Shutting down license server...")
 
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer shutdownCancel()
 
-		// Attempt to gracefully shut down the server first.
 		var shutdownErr error
 		if err := srv.Shutdown(shutdownCtx); err != nil {
 			logger.Logger.Error("Server shutdown error", zap.Error(err))
@@ -93,8 +85,7 @@ func main() {
 			logger.Logger.Sugar().Info("DB connection gracefully stopped")
 		}
 
-		logger.Logger.Info("Server shutdown complete")
-		// Return the server shutdown error if it happened.
+		logger.Logger.Info("License server shutdown complete")
 		return shutdownErr
 	})
 

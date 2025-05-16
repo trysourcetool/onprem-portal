@@ -16,6 +16,7 @@ type DB interface {
 	ExecContext(context.Context, string, ...any) (sql.Result, error)
 	GetContext(context.Context, any, string, ...any) error
 	QueryxContext(context.Context, string, ...any) (*sqlx.Rows, error)
+	QueryRowxContext(context.Context, string, ...any) *sqlx.Row
 	SelectContext(context.Context, any, string, ...any) error
 }
 
@@ -55,6 +56,11 @@ func (l *queryLogger) GetContext(ctx context.Context, dest any, query string, ar
 func (l *queryLogger) QueryxContext(ctx context.Context, query string, args ...any) (*sqlx.Rows, error) {
 	logger.Logger.Sugar().Debugf("%s, args: %s", query, args)
 	return l.db.QueryxContext(ctx, query, args...)
+}
+
+func (l *queryLogger) QueryRowxContext(ctx context.Context, query string, args ...any) *sqlx.Row {
+	logger.Logger.Sugar().Debugf("%s, args: %s", query, args)
+	return l.db.QueryRowxContext(ctx, query, args...)
 }
 
 func (l *queryLogger) SelectContext(ctx context.Context, dest any, query string, args ...any) error {

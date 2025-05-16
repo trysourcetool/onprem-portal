@@ -49,6 +49,27 @@ func (s *licenseStore) GetByUserID(ctx context.Context, userID uuid.UUID) (*core
 	return &l, nil
 }
 
+func (s *licenseStore) GetByKeyHash(ctx context.Context, keyHash string) (*core.License, error) {
+	query, args, err := s.builder.
+		Select(s.columns()...).
+		From(`"license" l`).
+		Where(sq.Eq{`l."key_hash"`: keyHash}).
+		ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	var l core.License
+	if err := s.db.GetContext(ctx, &l, query, args...); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errdefs.ErrLicenseNotFound(err)
+		}
+		return nil, err
+	}
+
+	return &l, nil
+}
+
 func (s *licenseStore) Create(ctx context.Context, l *core.License) error {
 	if _, err := s.builder.
 		Insert(`"license"`).

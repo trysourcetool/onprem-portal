@@ -7,6 +7,8 @@ import (
 type Stores interface {
 	License() LicenseStore
 	User() UserStore
+	Plan() PlanStore
+	Subscription() SubscriptionStore
 }
 
 type DB interface {
