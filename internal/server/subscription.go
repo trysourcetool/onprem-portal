@@ -99,21 +99,3 @@ func (s *Server) handleUpgradeSubscription(w http.ResponseWriter, r *http.Reques
 	}
 	return s.renderJSON(w, http.StatusOK, statusResponse{Code: http.StatusOK, Message: "Subscription upgraded"})
 }
-
-func (s *Server) handleCancelSubscription(w http.ResponseWriter, r *http.Request) error {
-	ctx := r.Context()
-	ctxUser := internal.ContextUser(ctx)
-	sub, err := s.db.Subscription().GetByUserID(ctx, ctxUser.ID)
-	if err != nil {
-		return err
-	}
-	sub.Status = core.SubscriptionStatusCanceled
-	if err := s.db.Subscription().Update(ctx, sub); err != nil {
-		return err
-	}
-	ctxUser.SetScheduledDeletionAt()
-	if err := s.db.User().Update(ctx, ctxUser); err != nil {
-		return err
-	}
-	return s.renderJSON(w, http.StatusOK, statusResponse{Code: http.StatusOK, Message: "Subscription canceled"})
-}

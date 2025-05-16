@@ -101,7 +101,6 @@ func (s *Server) installOnpremPortalHandlers(router *chi.Mux) {
 				r.Use(s.authUser)
 				r.Get("/", s.errorHandler(s.handleGetSubscription))
 				r.Post("/upgrade", s.errorHandler(s.handleUpgradeSubscription))
-				r.Post("/cancel", s.errorHandler(s.handleCancelSubscription))
 			})
 
 			r.Route("/stripe", func(r chi.Router) {
