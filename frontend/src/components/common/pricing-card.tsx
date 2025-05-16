@@ -21,22 +21,24 @@ export const PricingCard: FC<{
   description: string;
   price: number;
   period?: string;
-  onDialogSubmit?: () => void;
+  onUpgrade?: () => void;
   features: Array<string>;
   isPopular?: boolean;
   buttonDisabled?: boolean;
-  buttonType: 'docs' | 'dialog';
+  planType: 'free' | 'team' | 'business';
+  hasPlan?: boolean;
   isCurrentPlan?: boolean;
 }> = ({
   title,
   description,
   price,
   period,
-  onDialogSubmit,
+  onUpgrade,
   features,
   isPopular = false,
   buttonDisabled = false,
-  buttonType,
+  planType,
+  hasPlan = false,
   isCurrentPlan = false,
 }) => {
   return (
@@ -58,7 +60,7 @@ export const PricingCard: FC<{
               <span className="text-muted-foreground text-base">/{period}</span>
             )}
           </div>
-          {buttonType === 'docs' && (
+          {planType === 'free' && (
             <Button
               disabled={buttonDisabled}
               asChild
@@ -69,7 +71,16 @@ export const PricingCard: FC<{
               </a>
             </Button>
           )}
-          {buttonType === 'dialog' && (
+          {(planType === 'team' || planType === 'business') && !hasPlan && (
+            <Button
+              disabled={buttonDisabled}
+              className="cursor-pointer"
+              onClick={onUpgrade}
+            >
+              Upgrade
+            </Button>
+          )}
+          {(planType === 'team' || planType === 'business') && hasPlan && (
             <AlertDialog>
               <AlertDialogTrigger
                 disabled={isCurrentPlan || buttonDisabled}
