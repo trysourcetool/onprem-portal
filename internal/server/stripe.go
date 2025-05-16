@@ -11,7 +11,6 @@ import (
 	"github.com/stripe/stripe-go/v82"
 	billingportal "github.com/stripe/stripe-go/v82/billingportal/session"
 	checkout "github.com/stripe/stripe-go/v82/checkout/session"
-	"github.com/stripe/stripe-go/v82/customer"
 	"github.com/stripe/stripe-go/v82/subscription"
 	"github.com/stripe/stripe-go/v82/subscriptionitem"
 	"github.com/stripe/stripe-go/v82/webhook"
@@ -54,24 +53,7 @@ func (s *Server) handleCreateCheckoutSession(w http.ResponseWriter, r *http.Requ
 		return err
 	}
 	stripe.Key = config.Config.Stripe.Key
-	customerID := sub.StripeCustomerID
-	if customerID == "" {
-		cusParams := &stripe.CustomerParams{
-			Email: stripe.String(ctxUser.Email),
-			Name:  stripe.String(ctxUser.FullName()),
-		}
-		cusObj, err := customer.New(cusParams)
-		if err != nil {
-			return errdefs.ErrInternal(err)
-		}
-		customerID = cusObj.ID
-		sub.StripeCustomerID = customerID
-		if err := s.db.Subscription().Update(ctx, sub); err != nil {
-			return errdefs.ErrInternal(err)
-		}
-	}
 	params := &stripe.CheckoutSessionParams{
-		Customer:           stripe.String(customerID),
 		PaymentMethodTypes: stripe.StringSlice([]string{"card"}),
 		Mode:               stripe.String(string(stripe.CheckoutSessionModeSubscription)),
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
