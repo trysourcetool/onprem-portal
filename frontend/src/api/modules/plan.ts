@@ -16,7 +16,5 @@ export const getPlans = async () => {
     auth: true,
   });
 
-  console.log({ res });
-
   return res;
 };

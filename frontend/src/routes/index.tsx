@@ -6,12 +6,13 @@ import { useAuth } from '@/components/provider/auth-provider';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/common/page-header';
 import { useBreadcrumbs } from '@/hooks/use-breadcrumbs';
-import { checkAccountExpiredDays } from '@/lib/account';
+import { checkTrialExpiredDays } from '@/lib/account';
+import { useSubscription } from '@/components/provider/subscription-provider';
 
 export default function Index() {
   const { account } = useAuth();
   const { setBreadcrumbsState } = useBreadcrumbs();
-
+  const { subscription } = useSubscription();
   const onCopy = async (value: string) => {
     try {
       await navigator.clipboard.writeText(value);
@@ -33,11 +34,13 @@ export default function Index() {
         <div className="bg-muted flex flex-col gap-4 px-6 py-4">
           <div className="flex flex-col gap-1">
             <p className="text-lg font-bold">License Key</p>
-            <p className="text-muted-foreground text-sm">
-              Trial license:{' '}
-              {account && checkAccountExpiredDays(account).trialExpiredDays}/14
-              days remaining
-            </p>
+            {subscription?.status === 'trial' && (
+              <p className="text-muted-foreground text-sm">
+                Trial license:{' '}
+                {account && checkTrialExpiredDays(subscription).expiredDays}/14
+                days remaining
+              </p>
+            )}
           </div>
           <div className="flex gap-3">
             <code className="bg-input flex-1 rounded-md px-3 py-2.5 text-sm">

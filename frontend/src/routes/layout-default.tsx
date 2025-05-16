@@ -111,8 +111,11 @@ export default function DefaultLayout() {
                 </SidebarMenuButton>
               </SidebarMenu>
               <SidebarMenu>
-                <SidebarMenuButton asChild isActive={pathname === '/pricing'}>
-                  <Link to={'/pricing'}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === '/settings/billing'}
+                >
+                  <Link to={'/settings/billing'}>
                     <Banknote />
                     <span>Pricing</span>
                   </Link>

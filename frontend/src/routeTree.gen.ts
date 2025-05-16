@@ -13,9 +13,9 @@
 import { Route as rootRoute } from './routes/root'
 import { Route as layoutDefaultImport } from './routes/layout-default'
 import { Route as indexImport } from './routes/index'
-import { Route as PricingIndexImport } from './routes/pricing/index'
 import { Route as LoginIndexImport } from './routes/login/index'
 import { Route as SignupFollowupIndexImport } from './routes/signup/followup/index'
+import { Route as SettingsBillingIndexImport } from './routes/settings/billing/index'
 import { Route as LoginEmailSentIndexImport } from './routes/login/emailSent/index'
 import { Route as AuthMagicAuthenticateIndexImport } from './routes/auth/magic/authenticate/index'
 import { Route as AuthGoogleCallbackIndexImport } from './routes/auth/google/callback/index'
@@ -33,12 +33,6 @@ const indexRoute = indexImport.update({
   getParentRoute: () => layoutDefaultRoute,
 } as any)
 
-const PricingIndexRoute = PricingIndexImport.update({
-  id: '/pricing/',
-  path: '/pricing/',
-  getParentRoute: () => layoutDefaultRoute,
-} as any)
-
 const LoginIndexRoute = LoginIndexImport.update({
   id: '/login/',
   path: '/login/',
@@ -48,6 +42,12 @@ const LoginIndexRoute = LoginIndexImport.update({
 const SignupFollowupIndexRoute = SignupFollowupIndexImport.update({
   id: '/signup/followup/',
   path: '/signup/followup/',
+  getParentRoute: () => layoutDefaultRoute,
+} as any)
+
+const SettingsBillingIndexRoute = SettingsBillingIndexImport.update({
+  id: '/settings/billing/',
+  path: '/settings/billing/',
   getParentRoute: () => layoutDefaultRoute,
 } as any)
 
@@ -96,18 +96,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginIndexImport
       parentRoute: typeof layoutDefaultImport
     }
-    '/_default/pricing/': {
-      id: '/_default/pricing/'
-      path: '/pricing'
-      fullPath: '/pricing'
-      preLoaderRoute: typeof PricingIndexImport
-      parentRoute: typeof layoutDefaultImport
-    }
     '/_default/login/emailSent/': {
       id: '/_default/login/emailSent/'
       path: '/login/emailSent'
       fullPath: '/login/emailSent'
       preLoaderRoute: typeof LoginEmailSentIndexImport
+      parentRoute: typeof layoutDefaultImport
+    }
+    '/_default/settings/billing/': {
+      id: '/_default/settings/billing/'
+      path: '/settings/billing'
+      fullPath: '/settings/billing'
+      preLoaderRoute: typeof SettingsBillingIndexImport
       parentRoute: typeof layoutDefaultImport
     }
     '/_default/signup/followup/': {
@@ -139,8 +139,8 @@ declare module '@tanstack/react-router' {
 interface layoutDefaultRouteChildren {
   indexRoute: typeof indexRoute
   LoginIndexRoute: typeof LoginIndexRoute
-  PricingIndexRoute: typeof PricingIndexRoute
   LoginEmailSentIndexRoute: typeof LoginEmailSentIndexRoute
+  SettingsBillingIndexRoute: typeof SettingsBillingIndexRoute
   SignupFollowupIndexRoute: typeof SignupFollowupIndexRoute
   AuthGoogleCallbackIndexRoute: typeof AuthGoogleCallbackIndexRoute
   AuthMagicAuthenticateIndexRoute: typeof AuthMagicAuthenticateIndexRoute
@@ -149,8 +149,8 @@ interface layoutDefaultRouteChildren {
 const layoutDefaultRouteChildren: layoutDefaultRouteChildren = {
   indexRoute: indexRoute,
   LoginIndexRoute: LoginIndexRoute,
-  PricingIndexRoute: PricingIndexRoute,
   LoginEmailSentIndexRoute: LoginEmailSentIndexRoute,
+  SettingsBillingIndexRoute: SettingsBillingIndexRoute,
   SignupFollowupIndexRoute: SignupFollowupIndexRoute,
   AuthGoogleCallbackIndexRoute: AuthGoogleCallbackIndexRoute,
   AuthMagicAuthenticateIndexRoute: AuthMagicAuthenticateIndexRoute,
@@ -164,8 +164,8 @@ export interface FileRoutesByFullPath {
   '': typeof layoutDefaultRouteWithChildren
   '/': typeof indexRoute
   '/login': typeof LoginIndexRoute
-  '/pricing': typeof PricingIndexRoute
   '/login/emailSent': typeof LoginEmailSentIndexRoute
+  '/settings/billing': typeof SettingsBillingIndexRoute
   '/signup/followup': typeof SignupFollowupIndexRoute
   '/auth/google/callback': typeof AuthGoogleCallbackIndexRoute
   '/auth/magic/authenticate': typeof AuthMagicAuthenticateIndexRoute
@@ -174,8 +174,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof indexRoute
   '/login': typeof LoginIndexRoute
-  '/pricing': typeof PricingIndexRoute
   '/login/emailSent': typeof LoginEmailSentIndexRoute
+  '/settings/billing': typeof SettingsBillingIndexRoute
   '/signup/followup': typeof SignupFollowupIndexRoute
   '/auth/google/callback': typeof AuthGoogleCallbackIndexRoute
   '/auth/magic/authenticate': typeof AuthMagicAuthenticateIndexRoute
@@ -186,8 +186,8 @@ export interface FileRoutesById {
   '/_default': typeof layoutDefaultRouteWithChildren
   '/_default/': typeof indexRoute
   '/_default/login/': typeof LoginIndexRoute
-  '/_default/pricing/': typeof PricingIndexRoute
   '/_default/login/emailSent/': typeof LoginEmailSentIndexRoute
+  '/_default/settings/billing/': typeof SettingsBillingIndexRoute
   '/_default/signup/followup/': typeof SignupFollowupIndexRoute
   '/_default/auth/google/callback/': typeof AuthGoogleCallbackIndexRoute
   '/_default/auth/magic/authenticate/': typeof AuthMagicAuthenticateIndexRoute
@@ -199,8 +199,8 @@ export interface FileRouteTypes {
     | ''
     | '/'
     | '/login'
-    | '/pricing'
     | '/login/emailSent'
+    | '/settings/billing'
     | '/signup/followup'
     | '/auth/google/callback'
     | '/auth/magic/authenticate'
@@ -208,8 +208,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
-    | '/pricing'
     | '/login/emailSent'
+    | '/settings/billing'
     | '/signup/followup'
     | '/auth/google/callback'
     | '/auth/magic/authenticate'
@@ -218,8 +218,8 @@ export interface FileRouteTypes {
     | '/_default'
     | '/_default/'
     | '/_default/login/'
-    | '/_default/pricing/'
     | '/_default/login/emailSent/'
+    | '/_default/settings/billing/'
     | '/_default/signup/followup/'
     | '/_default/auth/google/callback/'
     | '/_default/auth/magic/authenticate/'
@@ -252,8 +252,8 @@ export const routeTree = rootRoute
       "children": [
         "/_default/",
         "/_default/login/",
-        "/_default/pricing/",
         "/_default/login/emailSent/",
+        "/_default/settings/billing/",
         "/_default/signup/followup/",
         "/_default/auth/google/callback/",
         "/_default/auth/magic/authenticate/"
@@ -267,12 +267,12 @@ export const routeTree = rootRoute
       "filePath": "login/index.tsx",
       "parent": "/_default"
     },
-    "/_default/pricing/": {
-      "filePath": "pricing/index.tsx",
-      "parent": "/_default"
-    },
     "/_default/login/emailSent/": {
       "filePath": "login/emailSent/index.tsx",
+      "parent": "/_default"
+    },
+    "/_default/settings/billing/": {
+      "filePath": "settings/billing/index.tsx",
       "parent": "/_default"
     },
     "/_default/signup/followup/": {

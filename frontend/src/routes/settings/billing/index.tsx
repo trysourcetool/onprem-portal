@@ -21,8 +21,6 @@ export default function Index() {
   const { subscription, upgradeSubscription, isUpgrading } = useSubscription();
   const { setBreadcrumbsState } = useBreadcrumbs();
 
-  console.log({ subscription });
-
   const createCheckoutSession = useMutation({
     mutationFn: (planId: string) =>
       api.stripe.createCheckoutSession({
@@ -41,7 +39,7 @@ export default function Index() {
   const businessPlan = plans?.plans.find((plan) => plan.name === 'Business');
 
   useEffect(() => {
-    setBreadcrumbsState?.([{ label: 'Pricing', to: '/pricing' }]);
+    setBreadcrumbsState?.([{ label: 'Pricing', to: '/settings/billing' }]);
   }, [setBreadcrumbsState]);
 
   const handleUpgrade = useCallback(
@@ -49,17 +47,17 @@ export default function Index() {
       if (subscription?.planId === planId) {
         return;
       }
-      if (subscription?.stripeSubscriptionId) {
+      if (subscription?.plan) {
         upgradeSubscription(planId);
       } else {
         createCheckoutSession.mutate(planId);
       }
     },
     [
-      subscription?.planId,
       upgradeSubscription,
       createCheckoutSession,
-      subscription?.stripeSubscriptionId,
+      subscription?.planId,
+      subscription?.plan,
     ],
   );
   return (
@@ -90,6 +88,7 @@ export default function Index() {
                   'More than 5 users',
                 ]}
                 isPopular
+                isCurrentPlan={subscription?.planId === teamPlan.id}
                 buttonDisabled={isUpgrading}
                 onDialogSubmit={() => handleUpgrade(teamPlan.id)}
               />
@@ -108,6 +107,7 @@ export default function Index() {
                   'Unlimited Environments',
                   'Audit Logs',
                 ]}
+                isCurrentPlan={subscription?.planId === businessPlan.id}
                 buttonDisabled={isUpgrading}
                 onDialogSubmit={() => handleUpgrade(businessPlan.id)}
               />
@@ -119,6 +119,6 @@ export default function Index() {
   );
 }
 
-export const Route = createFileRoute('/_default/pricing/')({
+export const Route = createFileRoute('/_default/settings/billing/')({
   component: Index,
 });
