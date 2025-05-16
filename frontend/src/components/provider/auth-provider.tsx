@@ -83,7 +83,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = (props) => {
   const handleUnauthorizedRoute = useCallback(() => {
     if (
       pathname === '/' ||
-      pathname === '/pricing' ||
+      pathname === '/settings/billing' ||
       (pathname.startsWith('/users') &&
         !pathname.startsWith('/users/oauth/google'))
     ) {

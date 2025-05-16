@@ -75,7 +75,10 @@ export const PricingCard: FC<{
                 disabled={isCurrentPlan || buttonDisabled}
                 asChild
               >
-                <Button className="cursor-pointer">
+                <Button
+                  className="cursor-pointer"
+                  variant={isCurrentPlan ? 'secondary' : 'default'}
+                >
                   {isCurrentPlan ? 'Current Plan' : 'Upgrade'}
                 </Button>
               </AlertDialogTrigger>
@@ -91,8 +94,9 @@ export const PricingCard: FC<{
                     Cancel
                   </AlertDialogCancel>
                   <AlertDialogAction
-                    onClick={onDialogSubmit}
+                    onClick={() => !isCurrentPlan && onDialogSubmit?.()}
                     className="cursor-pointer"
+                    disabled={isCurrentPlan}
                   >
                     Upgrade
                   </AlertDialogAction>

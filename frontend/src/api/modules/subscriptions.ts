@@ -1,3 +1,4 @@
+import type { Plan } from './plan';
 import * as api from '@/api/instance';
 
 type SubscriptionStatus = '' | 'trial' | 'active' | 'canceled' | 'past_due';
@@ -6,9 +7,8 @@ export type Subscription = {
   id: string;
   userId: string;
   planId: string;
+  plan: Plan;
   status: SubscriptionStatus;
-  stripeCustomerId: string;
-  stripeSubscriptionId: string;
   trialStart: string;
   trialEnd: string;
   createdAt: string;
