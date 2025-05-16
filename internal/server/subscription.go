@@ -2,12 +2,17 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/stripe/stripe-go/v82"
+	"github.com/stripe/stripe-go/v82/subscription"
+	"github.com/stripe/stripe-go/v82/subscriptionitem"
 
 	"github.com/trysourcetool/onprem-portal/internal"
+	"github.com/trysourcetool/onprem-portal/internal/config"
 	"github.com/trysourcetool/onprem-portal/internal/core"
 	"github.com/trysourcetool/onprem-portal/internal/errdefs"
 )
@@ -88,10 +93,34 @@ func (s *Server) handleUpgradeSubscription(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		return errdefs.ErrInvalidArgument(err)
 	}
+	plan, err := s.db.Plan().GetByID(ctx, planID)
+	if err != nil {
+		return err
+	}
 	sub, err := s.db.Subscription().GetByUserID(ctx, ctxUser.ID)
 	if err != nil {
 		return err
 	}
+
+	if sub.StripeSubscriptionID != "" {
+		stripe.Key = config.Config.Stripe.Key
+		stripeSub, err := subscription.Get(sub.StripeSubscriptionID, nil)
+		if err != nil {
+			return errdefs.ErrInternal(err)
+		}
+		if stripeSub.Items == nil || len(stripeSub.Items.Data) == 0 {
+			return errdefs.ErrInternal(fmt.Errorf("stripe subscription items not found for user"))
+		}
+		params := &stripe.SubscriptionItemParams{
+			Price:    stripe.String(plan.StripePriceID),
+			Quantity: stripe.Int64(sub.SeatCount),
+		}
+		_, err = subscriptionitem.Update(stripeSub.Items.Data[0].ID, params)
+		if err != nil {
+			return errdefs.ErrInternal(err)
+		}
+	}
+
 	sub.PlanID = &planID
 	sub.Status = core.SubscriptionStatusActive
 	if err := s.db.Subscription().Update(ctx, sub); err != nil {
