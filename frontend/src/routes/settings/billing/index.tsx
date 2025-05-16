@@ -70,7 +70,7 @@ export default function Index() {
               title="Migrate to Community Edition"
               description="Perfect for testing and small projects"
               price={0}
-              buttonType="docs"
+              planType="free"
               features={['Up to 5 users', 'Unlimited apps']}
               buttonDisabled={isUpgrading}
             />
@@ -82,7 +82,8 @@ export default function Index() {
                 description="Ideal for growing teams and collaboration"
                 price={teamPlan.price}
                 period="user/month"
-                buttonType="dialog"
+                planType="team"
+                hasPlan={!!subscription?.plan}
                 features={[
                   'Staging Environment Available',
                   'More than 5 users',
@@ -90,7 +91,7 @@ export default function Index() {
                 isPopular
                 isCurrentPlan={subscription?.planId === teamPlan.id}
                 buttonDisabled={isUpgrading}
-                onDialogSubmit={() => handleUpgrade(teamPlan.id)}
+                onUpgrade={() => handleUpgrade(teamPlan.id)}
               />
             )}
           </div>
@@ -101,15 +102,12 @@ export default function Index() {
                 description="Advanced features for enterprise needs"
                 price={businessPlan.price}
                 period="month"
-                buttonType="dialog"
-                features={[
-                  'Permission Control',
-                  'Unlimited Environments',
-                  'Audit Logs',
-                ]}
+                planType="business"
+                hasPlan={!!subscription?.plan}
+                features={['Permission Control', 'Unlimited Environments']}
                 isCurrentPlan={subscription?.planId === businessPlan.id}
                 buttonDisabled={isUpgrading}
-                onDialogSubmit={() => handleUpgrade(businessPlan.id)}
+                onUpgrade={() => handleUpgrade(businessPlan.id)}
               />
             )}
           </div>
