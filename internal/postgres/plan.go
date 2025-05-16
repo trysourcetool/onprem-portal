@@ -39,6 +39,22 @@ func (s *planStore) GetByID(ctx context.Context, id uuid.UUID) (*core.Plan, erro
 	return &p, nil
 }
 
+func (s *planStore) GetByStripePriceID(ctx context.Context, stripePriceID string) (*core.Plan, error) {
+	query, args, err := s.builder.
+		Select(`p."id"`, `p."name"`, `p."price"`, `p."stripe_price_id"`, `p."created_at"`, `p."updated_at"`).
+		From(`"plan" p`).
+		Where(sq.Eq{`p."stripe_price_id"`: stripePriceID}).
+		ToSql()
+	if err != nil {
+		return nil, err
+	}
+	var p core.Plan
+	if err := s.db.GetContext(ctx, &p, query, args...); err != nil {
+		return nil, err
+	}
+	return &p, nil
+}
+
 func (s *planStore) List(ctx context.Context) ([]*core.Plan, error) {
 	query, args, err := s.builder.
 		Select(`p."id"`, `p."name"`, `p."price"`, `p."stripe_price_id"`, `p."created_at"`, `p."updated_at"`).
