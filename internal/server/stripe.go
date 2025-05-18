@@ -1,7 +1,6 @@
 package server
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -176,22 +175,31 @@ func (s *Server) handleStripeWebhook(w http.ResponseWriter, r *http.Request) err
 			break
 		}
 		sub.PlanID = &plan.ID
+		u, err := s.db.User().GetByID(ctx, sub.UserID)
+		if err != nil {
+			break
+		}
 		// Update status based on Stripe subscription status
 		switch subObj.Status {
 		case "active":
 			sub.Status = core.SubscriptionStatusActive
+			u.ScheduledDeletionAt = nil
 		case "trialing":
 			sub.Status = core.SubscriptionStatusTrial
+			u.ScheduledDeletionAt = nil
 		case "canceled":
 			sub.Status = core.SubscriptionStatusCanceled
-			_ = s.scheduleUserDeletion(ctx, sub.UserID)
+			u.SetScheduledDeletionAt()
 		case "past_due":
 			sub.Status = core.SubscriptionStatusPastDue
-			_ = s.scheduleUserDeletion(ctx, sub.UserID)
+			u.SetScheduledDeletionAt()
 		default:
 			sub.Status = core.SubscriptionStatusUnknown
 		}
 		if err := s.db.Subscription().Update(ctx, sub); err != nil {
+			break
+		}
+		if err := s.db.User().Update(ctx, u); err != nil {
 			break
 		}
 	case "customer.subscription.deleted":
@@ -208,7 +216,14 @@ func (s *Server) handleStripeWebhook(w http.ResponseWriter, r *http.Request) err
 		if err := s.db.Subscription().Update(ctx, sub); err != nil {
 			break
 		}
-		_ = s.scheduleUserDeletion(ctx, sub.UserID)
+		u, err := s.db.User().GetByID(ctx, sub.UserID)
+		if err != nil {
+			break
+		}
+		u.SetScheduledDeletionAt()
+		if err := s.db.User().Update(ctx, u); err != nil {
+			break
+		}
 	default:
 		// ignore other events
 	}
@@ -281,13 +296,4 @@ func (s *Server) handleUpdateSeats(w http.ResponseWriter, r *http.Request) error
 		return err
 	}
 	return s.renderJSON(w, http.StatusOK, statusResponse{Code: 0, Message: "ok"})
-}
-
-func (s *Server) scheduleUserDeletion(ctx context.Context, userID uuid.UUID) error {
-	u, err := s.db.User().GetByID(ctx, userID)
-	if err != nil {
-		return err
-	}
-	u.SetScheduledDeletionAt()
-	return s.db.User().Update(ctx, u)
 }
