@@ -105,7 +105,7 @@ export const PricingCard: FC<{
                     Cancel
                   </AlertDialogCancel>
                   <AlertDialogAction
-                    onClick={() => !isCurrentPlan && onDialogSubmit?.()}
+                    onClick={() => !isCurrentPlan && onUpgrade?.()}
                     className="cursor-pointer"
                     disabled={isCurrentPlan}
                   >
