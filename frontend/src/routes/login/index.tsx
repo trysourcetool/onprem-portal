@@ -85,8 +85,12 @@ export default function Login() {
       <Form {...form}>
         <Card className="flex w-full max-w-[384px] flex-col gap-6 p-6">
           <CardHeader>
-            <CardTitle className="text-2xl">Welcome to Sourcetool.</CardTitle>
-            <CardDescription>Log in to build your first app.</CardDescription>
+            <CardTitle className="text-2xl">
+              Welcome to Sourcetool Self-Hosted Portal.
+            </CardTitle>
+            <CardDescription>
+              Log in to manage your license key and billing.
+            </CardDescription>
           </CardHeader>
 
           <form onSubmit={onSubmit} className="flex flex-col gap-4">

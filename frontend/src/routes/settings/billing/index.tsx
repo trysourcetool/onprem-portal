@@ -84,10 +84,7 @@ export default function Index() {
                 period="user/month"
                 planType="team"
                 hasPlan={!!subscription?.plan}
-                features={[
-                  'More than 5 users',
-                  'Staging environment',
-                ]}
+                features={['More than 5 users', 'Staging environment']}
                 isPopular
                 isCurrentPlan={subscription?.planId === teamPlan.id}
                 buttonDisabled={isUpgrading}

@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import type { User } from '@/api/modules/users';
 import type { Subscription } from '@/api/modules/subscriptions';
 
-export const checkAccountExpiredDays = (account: User | null) => {
+export const getAccountDeletionRemainingDays = (account: User | null) => {
   if (!account) return 0;
 
   const now = dayjs();
@@ -13,7 +13,7 @@ export const checkAccountExpiredDays = (account: User | null) => {
   return expiredDays < 0 ? 0 : expiredDays + 1;
 };
 
-export const checkTrialExpiredDays = (subscription: Subscription | null) => {
+export const getTrialStatus = (subscription: Subscription | null) => {
   if (
     subscription &&
     subscription?.status === 'trial' &&

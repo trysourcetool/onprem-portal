@@ -6,7 +6,7 @@ import { useAuth } from '@/components/provider/auth-provider';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/common/page-header';
 import { useBreadcrumbs } from '@/hooks/use-breadcrumbs';
-import { checkTrialExpiredDays } from '@/lib/account';
+import { getTrialStatus } from '@/lib/account';
 import { useSubscription } from '@/components/provider/subscription-provider';
 
 export default function Index() {
@@ -37,8 +37,8 @@ export default function Index() {
             {subscription?.status === 'trial' && (
               <p className="text-muted-foreground text-sm">
                 Trial license:{' '}
-                {account && checkTrialExpiredDays(subscription).expiredDays}/14
-                days remaining
+                {account && getTrialStatus(subscription).expiredDays}/14 days
+                remaining.
               </p>
             )}
           </div>
