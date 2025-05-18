@@ -16,7 +16,7 @@ export default function Index() {
   const onCopy = async (value: string) => {
     try {
       await navigator.clipboard.writeText(value);
-      toast('License Key copied to clipboard');
+      toast('License key copied to clipboard');
     } catch (error) {
       console.error(error);
       toast('Failed to copy license key');
@@ -24,16 +24,16 @@ export default function Index() {
   };
 
   useEffect(() => {
-    setBreadcrumbsState?.([{ label: 'License Key', to: '/' }]);
+    setBreadcrumbsState?.([{ label: 'License key', to: '/' }]);
   }, [setBreadcrumbsState]);
 
   return (
     <div>
-      <PageHeader label="License Key" />
+      <PageHeader label="License key" />
       <div className="flex w-screen flex-col gap-4 px-4 py-6 md:w-auto md:gap-6 md:px-6">
         <div className="bg-muted flex flex-col gap-4 px-6 py-4">
           <div className="flex flex-col gap-1">
-            <p className="text-lg font-bold">License Key</p>
+            <p className="text-lg font-bold">License key</p>
             {subscription?.status === 'trial' && (
               <p className="text-muted-foreground text-sm">
                 Trial license:{' '}

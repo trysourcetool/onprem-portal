@@ -67,7 +67,7 @@ export default function Index() {
         <div className="flex flex-col items-stretch justify-center gap-6 px-20 py-8 md:flex-row">
           <div className="relative flex max-w-[296px] flex-1 flex-col [&>*]:flex-1">
             <PricingCard
-              title="Migrate to Community Edition"
+              title="Community Edition"
               description="Perfect for testing and small projects"
               price={0}
               planType="free"
@@ -85,8 +85,8 @@ export default function Index() {
                 planType="team"
                 hasPlan={!!subscription?.plan}
                 features={[
-                  'Staging Environment Available',
                   'More than 5 users',
+                  'Staging environment',
                 ]}
                 isPopular
                 isCurrentPlan={subscription?.planId === teamPlan.id}
@@ -101,10 +101,10 @@ export default function Index() {
                 title={businessPlan.name}
                 description="Advanced features for enterprise needs"
                 price={businessPlan.price}
-                period="month"
+                period="user/month"
                 planType="business"
                 hasPlan={!!subscription?.plan}
-                features={['Permission Control', 'Unlimited Environments']}
+                features={['Unlimited environments', 'Permission control']}
                 isCurrentPlan={subscription?.planId === businessPlan.id}
                 buttonDisabled={isUpgrading}
                 onUpgrade={() => handleUpgrade(businessPlan.id)}

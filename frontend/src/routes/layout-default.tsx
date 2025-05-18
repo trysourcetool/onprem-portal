@@ -106,7 +106,7 @@ export default function DefaultLayout() {
                 <SidebarMenuButton asChild isActive={pathname === '/'}>
                   <Link to={'/'}>
                     <KeyRound />
-                    <span>License Key</span>
+                    <span>License key</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenu>
@@ -128,7 +128,7 @@ export default function DefaultLayout() {
                     onClick={() => stripePortalUrl.mutate()}
                   >
                     <ReceiptText />
-                    <span className="flex-1">Manage Billing</span>
+                    <span className="flex-1">Manage billing</span>
                     <SquareArrowOutUpRight className="text-muted-foreground" />
                   </a>
                 </SidebarMenuButton>
