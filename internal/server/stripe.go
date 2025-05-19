@@ -252,6 +252,17 @@ func (s *Server) handleUpdateSeats(w http.ResponseWriter, r *http.Request) error
 		return err
 	}
 
+	// if trial, update db only
+	if sub.IsTrial() {
+		if err := s.db.WithTx(ctx, func(tx database.Tx) error {
+			_, err := tx.Subscription().UpdateSeatCount(ctx, sub.ID, req.Seats)
+			return err
+		}); err != nil {
+			return err
+		}
+		return s.renderJSON(w, http.StatusOK, statusResponse{Code: 0, Message: "ok"})
+	}
+
 	stripe.Key = config.Config.Stripe.Key
 	stripeSub, err := subscription.Get(sub.StripeSubscriptionID, nil)
 	if err != nil {
@@ -265,10 +276,6 @@ func (s *Server) handleUpdateSeats(w http.ResponseWriter, r *http.Request) error
 		seatCount, err := tx.Subscription().UpdateSeatCount(ctx, sub.ID, req.Seats)
 		if err != nil {
 			return err
-		}
-
-		if sub.IsTrial() {
-			return nil
 		}
 		if sub.IsPastDue() {
 			return errdefs.ErrInternal(fmt.Errorf("subscription is past due"))
