@@ -4,7 +4,17 @@ import {
   createFileRoute,
   useLocation,
 } from '@tanstack/react-router';
-import { ChevronsUpDown, FileText, LogOut } from 'lucide-react';
+import {
+  Banknote,
+  ChevronsUpDown,
+  KeyRound,
+  LogOut,
+  ReceiptText,
+  SquareArrowOutUpRight,
+} from 'lucide-react';
+import { Fragment } from 'react/jsx-runtime';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import {
   Sidebar,
   SidebarContent,
@@ -30,10 +40,36 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+import { useBreadcrumbs } from '@/hooks/use-breadcrumbs';
+import { api } from '@/api';
 
 export default function DefaultLayout() {
   const { account, handleLogout } = useAuth();
   const { pathname } = useLocation();
+  const { breadcrumbsState } = useBreadcrumbs();
+
+  const stripePortalUrl = useMutation({
+    mutationFn: async () => {
+      const res = await api.stripe.getCustomerPortalUrl();
+      return res;
+    },
+    onSuccess: (data) => {
+      window.location.href = data.url;
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
   return (
     <SidebarProvider>
       {account && (
@@ -69,9 +105,32 @@ export default function DefaultLayout() {
               <SidebarMenu>
                 <SidebarMenuButton asChild isActive={pathname === '/'}>
                   <Link to={'/'}>
-                    <FileText />
-                    <span>License Key</span>
+                    <KeyRound />
+                    <span>License key</span>
                   </Link>
+                </SidebarMenuButton>
+              </SidebarMenu>
+              <SidebarMenu>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === '/billing'}
+                >
+                  <Link to={'/billing'}>
+                    <Banknote />
+                    <span>Pricing</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenu>
+              <SidebarMenu>
+                <SidebarMenuButton asChild>
+                  <a
+                    className="flex items-center"
+                    onClick={() => stripePortalUrl.mutate()}
+                  >
+                    <ReceiptText />
+                    <span className="flex-1">Manage billing</span>
+                    <SquareArrowOutUpRight className="text-muted-foreground" />
+                  </a>
                 </SidebarMenuButton>
               </SidebarMenu>
             </SidebarGroup>
@@ -144,9 +203,34 @@ export default function DefaultLayout() {
       <SidebarInset className="flex flex-col">
         <header className="bg-background group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear">
           <div className="flex flex-1 items-center gap-2 px-4">
-            <div className="flex-1">
+            <div className="flex flex-1 items-center gap-2">
               {account ? (
-                <SidebarTrigger className="-ml-1" />
+                <>
+                  <SidebarTrigger className="-ml-1" />
+                  <Separator orientation="vertical" className="mr-2 !h-4" />
+                  <Breadcrumb>
+                    <BreadcrumbList>
+                      {breadcrumbsState?.map((breadcrumb, index) => (
+                        <Fragment key={breadcrumb.label}>
+                          {!!index && <BreadcrumbSeparator />}
+                          <BreadcrumbItem>
+                            {breadcrumb.to ? (
+                              <BreadcrumbLink asChild>
+                                <Link to={breadcrumb.to}>
+                                  {breadcrumb.label}
+                                </Link>
+                              </BreadcrumbLink>
+                            ) : (
+                              <BreadcrumbPage>
+                                {breadcrumb.label}
+                              </BreadcrumbPage>
+                            )}
+                          </BreadcrumbItem>
+                        </Fragment>
+                      ))}
+                    </BreadcrumbList>
+                  </Breadcrumb>
+                </>
               ) : (
                 <div className="size-8">
                   <img
@@ -159,7 +243,7 @@ export default function DefaultLayout() {
             </div>
           </div>
         </header>
-        <main className="flex flex-1 flex-col px-4 py-6 md:px-6 md:py-6">
+        <main className="flex flex-1 flex-col">
           <Outlet />
           <Toaster closeButton />
         </main>

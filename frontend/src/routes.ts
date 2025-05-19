@@ -11,5 +11,6 @@ export default rootRoute('root.tsx', [
     physical('/login', 'login'),
     physical('/auth', 'auth'),
     physical('/signup/followup', 'signup/followup'),
+    physical('/billing', 'billing'),
   ]),
 ]);

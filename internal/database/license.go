@@ -10,5 +10,6 @@ import (
 
 type LicenseStore interface {
 	GetByUserID(context.Context, uuid.UUID) (*core.License, error)
+	GetByKeyHash(context.Context, string) (*core.License, error)
 	Create(context.Context, *core.License) error
 }

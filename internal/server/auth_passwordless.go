@@ -253,6 +253,22 @@ func (s *Server) handleRegisterWithMagicLink(w http.ResponseWriter, r *http.Requ
 			return err
 		}
 
+		// Create subscription (trial)
+		trialStart := now
+		trialEnd := now.Add(time.Duration(core.TrialPeriodDays) * 24 * time.Hour)
+		sub := &core.Subscription{
+			ID:         uuid.Must(uuid.NewV4()),
+			UserID:     u.ID,
+			PlanID:     nil,
+			Status:     core.SubscriptionStatusTrial,
+			TrialStart: trialStart,
+			TrialEnd:   trialEnd,
+			SeatCount:  1,
+		}
+		if err := tx.Subscription().Create(ctx, sub); err != nil {
+			return err
+		}
+
 		token, err = jwt.SignAuthToken(u.ID.String(), xsrfToken, expiresAt)
 		if err != nil {
 			return err

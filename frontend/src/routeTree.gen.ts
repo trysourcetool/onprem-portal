@@ -14,6 +14,7 @@ import { Route as rootRoute } from './routes/root'
 import { Route as layoutDefaultImport } from './routes/layout-default'
 import { Route as indexImport } from './routes/index'
 import { Route as LoginIndexImport } from './routes/login/index'
+import { Route as BillingIndexImport } from './routes/billing/index'
 import { Route as SignupFollowupIndexImport } from './routes/signup/followup/index'
 import { Route as LoginEmailSentIndexImport } from './routes/login/emailSent/index'
 import { Route as AuthMagicAuthenticateIndexImport } from './routes/auth/magic/authenticate/index'
@@ -35,6 +36,12 @@ const indexRoute = indexImport.update({
 const LoginIndexRoute = LoginIndexImport.update({
   id: '/login/',
   path: '/login/',
+  getParentRoute: () => layoutDefaultRoute,
+} as any)
+
+const BillingIndexRoute = BillingIndexImport.update({
+  id: '/billing/',
+  path: '/billing/',
   getParentRoute: () => layoutDefaultRoute,
 } as any)
 
@@ -82,6 +89,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof indexImport
       parentRoute: typeof layoutDefaultImport
     }
+    '/_default/billing/': {
+      id: '/_default/billing/'
+      path: '/billing'
+      fullPath: '/billing'
+      preLoaderRoute: typeof BillingIndexImport
+      parentRoute: typeof layoutDefaultImport
+    }
     '/_default/login/': {
       id: '/_default/login/'
       path: '/login'
@@ -124,6 +138,7 @@ declare module '@tanstack/react-router' {
 
 interface layoutDefaultRouteChildren {
   indexRoute: typeof indexRoute
+  BillingIndexRoute: typeof BillingIndexRoute
   LoginIndexRoute: typeof LoginIndexRoute
   LoginEmailSentIndexRoute: typeof LoginEmailSentIndexRoute
   SignupFollowupIndexRoute: typeof SignupFollowupIndexRoute
@@ -133,6 +148,7 @@ interface layoutDefaultRouteChildren {
 
 const layoutDefaultRouteChildren: layoutDefaultRouteChildren = {
   indexRoute: indexRoute,
+  BillingIndexRoute: BillingIndexRoute,
   LoginIndexRoute: LoginIndexRoute,
   LoginEmailSentIndexRoute: LoginEmailSentIndexRoute,
   SignupFollowupIndexRoute: SignupFollowupIndexRoute,
@@ -147,6 +163,7 @@ const layoutDefaultRouteWithChildren = layoutDefaultRoute._addFileChildren(
 export interface FileRoutesByFullPath {
   '': typeof layoutDefaultRouteWithChildren
   '/': typeof indexRoute
+  '/billing': typeof BillingIndexRoute
   '/login': typeof LoginIndexRoute
   '/login/emailSent': typeof LoginEmailSentIndexRoute
   '/signup/followup': typeof SignupFollowupIndexRoute
@@ -156,6 +173,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof indexRoute
+  '/billing': typeof BillingIndexRoute
   '/login': typeof LoginIndexRoute
   '/login/emailSent': typeof LoginEmailSentIndexRoute
   '/signup/followup': typeof SignupFollowupIndexRoute
@@ -167,6 +185,7 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_default': typeof layoutDefaultRouteWithChildren
   '/_default/': typeof indexRoute
+  '/_default/billing/': typeof BillingIndexRoute
   '/_default/login/': typeof LoginIndexRoute
   '/_default/login/emailSent/': typeof LoginEmailSentIndexRoute
   '/_default/signup/followup/': typeof SignupFollowupIndexRoute
@@ -179,6 +198,7 @@ export interface FileRouteTypes {
   fullPaths:
     | ''
     | '/'
+    | '/billing'
     | '/login'
     | '/login/emailSent'
     | '/signup/followup'
@@ -187,6 +207,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/billing'
     | '/login'
     | '/login/emailSent'
     | '/signup/followup'
@@ -196,6 +217,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_default'
     | '/_default/'
+    | '/_default/billing/'
     | '/_default/login/'
     | '/_default/login/emailSent/'
     | '/_default/signup/followup/'
@@ -229,6 +251,7 @@ export const routeTree = rootRoute
       "filePath": "layout-default.tsx",
       "children": [
         "/_default/",
+        "/_default/billing/",
         "/_default/login/",
         "/_default/login/emailSent/",
         "/_default/signup/followup/",
@@ -238,6 +261,10 @@ export const routeTree = rootRoute
     },
     "/_default/": {
       "filePath": "index.tsx",
+      "parent": "/_default"
+    },
+    "/_default/billing/": {
+      "filePath": "billing/index.tsx",
       "parent": "/_default"
     },
     "/_default/login/": {

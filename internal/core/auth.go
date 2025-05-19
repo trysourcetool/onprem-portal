@@ -17,6 +17,7 @@ const (
 	XSRFTokenExpiration      = time.Duration(30*24) * time.Hour
 	RefreshTokenMaxAgeBuffer = time.Duration(7*24) * time.Hour
 	TmpTokenExpiration       = time.Duration(30) * time.Minute
+	TrialPeriodDays          = 14
 )
 
 func TokenExpiration() time.Duration {
