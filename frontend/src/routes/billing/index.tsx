@@ -39,7 +39,7 @@ export default function Index() {
   const businessPlan = plans?.plans.find((plan) => plan.name === 'Business');
 
   useEffect(() => {
-    setBreadcrumbsState?.([{ label: 'Pricing', to: '/settings/billing' }]);
+    setBreadcrumbsState?.([{ label: 'Pricing', to: '/billing' }]);
   }, [setBreadcrumbsState]);
 
   const handleUpgrade = useCallback(
@@ -114,6 +114,6 @@ export default function Index() {
   );
 }
 
-export const Route = createFileRoute('/_default/settings/billing/')({
+export const Route = createFileRoute('/_default/billing/')({
   component: Index,
 });

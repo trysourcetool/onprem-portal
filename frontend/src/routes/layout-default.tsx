@@ -113,9 +113,9 @@ export default function DefaultLayout() {
               <SidebarMenu>
                 <SidebarMenuButton
                   asChild
-                  isActive={pathname === '/settings/billing'}
+                  isActive={pathname === '/billing'}
                 >
-                  <Link to={'/settings/billing'}>
+                  <Link to={'/billing'}>
                     <Banknote />
                     <span>Pricing</span>
                   </Link>

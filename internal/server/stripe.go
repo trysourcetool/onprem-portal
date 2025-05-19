@@ -69,8 +69,8 @@ func (s *Server) handleCreateCheckoutSession(w http.ResponseWriter, r *http.Requ
 				"user_id": ctxUser.ID.String(),
 			},
 		},
-		SuccessURL: stripe.String(config.Config.BaseURL + "/settings/billing"),
-		CancelURL:  stripe.String(config.Config.BaseURL + "/settings/billing"),
+		SuccessURL: stripe.String(config.Config.BaseURL + "/billing"),
+		CancelURL:  stripe.String(config.Config.BaseURL + "/billing"),
 	}
 	sess, err := checkout.New(params)
 	if err != nil {
@@ -96,7 +96,7 @@ func (s *Server) handleGetCustomerPortalUrl(w http.ResponseWriter, r *http.Reque
 	stripe.Key = config.Config.Stripe.Key
 	params := &stripe.BillingPortalSessionParams{
 		Customer:  stripe.String(sub.StripeCustomerID),
-		ReturnURL: stripe.String(config.Config.BaseURL + "/settings/billing"),
+		ReturnURL: stripe.String(config.Config.BaseURL + "/billing"),
 	}
 	portal, err := billingportal.New(params)
 	if err != nil {
@@ -252,6 +252,7 @@ func (s *Server) handleUpdateSeats(w http.ResponseWriter, r *http.Request) error
 		return err
 	}
 
+	stripe.Key = config.Config.Stripe.Key
 	stripeSub, err := subscription.Get(sub.StripeSubscriptionID, nil)
 	if err != nil {
 		return errdefs.ErrInternal(err)

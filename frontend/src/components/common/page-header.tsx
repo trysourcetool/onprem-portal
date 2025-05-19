@@ -53,7 +53,7 @@ export const PageHeader: FC<{
             <span>
               Your trial will end in {expiredDays} days. To continue using all
               features after day 14, please upgrade.{' '}
-              <Link className="font-bold" to={'/settings/billing'}>
+              <Link className="font-bold" to={'/billing'}>
                 Learn more about pricing here.
               </Link>
             </span>
